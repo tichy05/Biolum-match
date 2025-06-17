@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Photo Comparison</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+      background-color:#222;
+    }
+
+
+    #controlPanel {
+      width: 30%;
+      background-color: #222;
+      color: white;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px
+    }
+
+    .thumb {
+      width: 80%;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .thumb:hover {
+      border-color: red;
+    }
+
+    #comparisonPanel {
+      width: 70%;
+      margin-top: 100px;
+      background-color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16pt;
+      height: 70%;
+    
+    }
+
+    #latestImage {
+      max-width: 65%;
+      max-height: 65%;
+      border: 5px solid #fff;
+    }
+
+ #customBtn {
+      max-width: 200px;
+      font-size: 14pt;
+      max-height: 50px;
+      border: 2px solid #17b2b8;
+      color: white;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: #222;
+    }
+
+
+@media only screen and (min-width: 600px)
+{#rotateWarning {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #000000cc;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  padding-top: 10vh;
+  z-index: 9999;
+  
+}}
+
+
+
+  </style>
+</head>
+<body>
+<div id="rotateWarning">Por favor, gire su dispositivo a modo horizontal (landscape)</div>
+
+  <!-- Left: Control Sample Thumbs -->
+  <div id="controlPanel">
+    <h3>Imagenes de Control</h3>
+    <!-- Thumbnails will be inserted here -->
+  </div>
+  <!-- Right: Latest Image -->
+  <div id="comparisonPanel">
+  
+<!-- Hide the native input -->
+<input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
+<button id="customBtn">Elegir archivo</button>
+<p>   </p>
+<p>   </p>
+ <span id="fileLabel">No file </span> 
+  <script>
+
+    // Array of control sample image URLs
+    const controlImages = [
+      
+      'NIVEL 1.jpg',
+      'NIVEL 2.jpg',
+      'NIVEL 3.jpg'
+    ];
+
+
+
+const comparisonPanel = document.getElementById('comparisonPanel');
+const controlPanel = document.getElementById('controlPanel');
+
+const fileInput = document.getElementById('fileInput');
+const customBtn = document.getElementById('customBtn');
+const fileLabel = document.getElementById('fileLabel');
+
+customBtn.onclick = () => fileInput.click();
+
+
+
+
+// Create file input
+
+fileInput.type = 'file';
+fileInput.id = 'fileInput';
+fileInput.accept = 'image/*';
+fileInput.style.marginBottom = '100px';
+
+// Create image element
+const latestImage = document.createElement('img');
+latestImage.id = 'latestImage';
+latestImage.src = '';
+latestImage.alt = '';
+latestImage.style.maxWidth = '75%';
+latestImage.style.maxHeight = '75%';
+latestImage.style.border = '5px solid #fff';
+
+// Add elements to the panel
+comparisonPanel.appendChild(fileInput);
+comparisonPanel.appendChild(latestImage);
+
+// File input event
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    fileLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      latestImage.src = e.target.result;
+      fileInput.value = ""; // Clear input after use
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileLabel.textContent = "Ningún archivo seleccionado";
+  }
+});
+
+// Load control images as thumbnails
+  controlImages.forEach((src, idx) => {
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.marginBottom = '15px';
+  container.style.fontSize = '14pt';
+
+  const label = document.createElement('span');
+  label.textContent = `Nivel ${idx + 1}`;
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = 'thumb';
+
+  img.onclick = () => {
+    const originalSrc = latestImage.src;
+    latestImage.src = src;
+
+    // Create and add label below the image
+    let tempLabel = document.createElement('span');
+    tempLabel.textContent = `Nivel ${idx + 1}`;
+    tempLabel.style.display = 'block';
+    tempLabel.style.marginTop = '10px';
+    tempLabel.style.fontSize = '18pt';
+    tempLabel.id = 'tempLabel';
+
+    // Remove any existing temp label
+    const oldLabel = document.getElementById('tempLabel');
+    if (oldLabel) oldLabel.remove();
+
+    comparisonPanel.appendChild(tempLabel);
+
+    setTimeout(() => {
+      latestImage.src = originalSrc;
+      tempLabel.remove();
+    }, 1000);
+  };
+
+  container.appendChild(img);
+  container.appendChild(label);
+  controlPanel.appendChild(container);
+});
+
+// Orientation check
+function checkOrientation() {
+  const warning = document.getElementById('rotateWarning');
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+  warning.style.display = isLandscape ? 'none' : 'block';
+}
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('load', checkOrientation);
+window.addEventListener('orientationchange', () => { setTimeout(checkOrientation, 300); });
+
+function goBack() {
+  window.history.back();
+}
+
+  </script>
+
+</body>
+</html>
