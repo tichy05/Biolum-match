@@ -131,8 +131,11 @@
 const controlImages = [
   'https://tichy05.github.io/Biolum-match/NIVEL 1.jpg',
   'https://tichy05.github.io/Biolum-match/NIVEL 2.jpg',
-  'https://tichy05.github.io/Biolum-match/NIVEL 3.jpg'
+  'https://tichy05.github.io/Biolum-match/NIVEL 3.jpg',
+  'https://tichy05.github.io/Biolum-match/NIVEL 4.jpg', 
+  'https://tichy05.github.io/Biolum-match/NIVEL 5.jpg' 
 ];
+;
 
 const controlPanel = document.getElementById('controlPanel');
 const comparisonPanel = document.getElementById('comparisonPanel');
@@ -161,8 +164,8 @@ fileInput.addEventListener('change', (event) => {
 
         exifData.innerHTML = `
           📷 ISO: ${iso || 'N/A'}<br/>
-          🕒 Tiempo de exposición: ${exposure || 'N/A'} seg<br/>
-          ƒ Número F: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+          🕒 Tiempo de exposición: ${exposure || 'N/A'} mseg<br/>
+         f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
           ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
           🔍 Longitud focal: ${focus || 'N/A'}
         `;
