@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Bioluminescence Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      display: flex; flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+      background-color: #222;
+      color: white;
+    }
+
+    #controlPanel {
+      width: 30%;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      background-color: #222;
+    }
+
+    .thumb {
+      width: 80%;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+    .thumb:hover { border-color: red; }
+
+    #comparisonPanel {
+      width: 70%;
+      background-color: #222;
+      display: flex; flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 20px;
+      font-size: 16pt;
+    }
+
+    #latestImage {
+      max-width: 65%;
+      max-height: 65%;
+      border: 5px solid #fff;
+    }
+
+    #customBtn {
+      max-width: 200px;
+      font-size: 14pt;
+      max-height: 50px;
+      border: 2px solid #17b2b8;
+      color: white;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: #222;
+      margin-top: 10px;
+    }
+
+    #instructions {
+      font-size: 14pt;
+      margin: 20px 10px;
+      text-align: left;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    #exifData {
+      margin-top: 10px;
+      font-size: 12pt;
+      color: #0f0;
+    }
+
+    #rotateWarning {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000000cc;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      padding-top: 10vh;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="rotateWarning">Por favor, gire su dispositivo a modo horizontal (landscape)</div>
+
+<!-- Left panel -->
+<div id="controlPanel">
+  <h3>Imagenes de Control</h3>
+
+  <div id="instructions">
+    <b>Guía de Fotografía:</b><br/><br/>
+    📷 App recomendada:<br/>
+    iPhone: Halide / ProCamera<br/>
+    Android: Camera FV-5 / ProShot<br/><br/>
+
+    ⚙️ <b>Configuración:</b><br/>
+    Shutter: 1/2 a 10 seg<br/>
+    ISO: 800 - 3200<br/>
+    Balance de blancos: Fijo (daylight)<br/>
+    Enfoque: Fijo (infinito)<br/><br/>
+
+    ⬆️ Suba su foto para comparar.
+  </div>
+</div>
+
+<!-- Right panel -->
+<div id="comparisonPanel">
+  <button id="customBtn">Elegir archivo</button>
+  <input type="file" id="fileInput" accept="image/*" style="display:none;">
+  <span id="fileLabel">Ningún archivo seleccionado</span>
+
+  <img id="latestImage" src="" alt="">
+  <div id="exifData"></div>
+</div>
+
+<script>
+const controlImages = [
+  'https://tichy05.github.io/Biolum-match/NIVEL 1.jpg',
+  'https://tichy05.github.io/Biolum-match/NIVEL 2.jpg',
+  'https://tichy05.github.io/Biolum-match/NIVEL 3.jpg'
+];
+
+const controlPanel = document.getElementById('controlPanel');
+const comparisonPanel = document.getElementById('comparisonPanel');
+const fileInput = document.getElementById('fileInput');
+const customBtn = document.getElementById('customBtn');
+const fileLabel = document.getElementById('fileLabel');
+const latestImage = document.getElementById('latestImage');
+const exifData = document.getElementById('exifData');
+
+customBtn.onclick = () => fileInput.click();
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    fileLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      latestImage.src = e.target.result;
+      exifData.textContent = "Leyendo datos EXIF...";
+      EXIF.getData(file, function() {
+        const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+        const exposure = EXIF.getTag(this, 'ExposureTime');
+        const fNumber = EXIF.getTag(this, 'FNumber');
+        const wb = EXIF.getTag(this, 'WhiteBalance');
+        const focus = EXIF.getTag(this, 'FocalLength');
+
+        exifData.innerHTML = `
+          📷 ISO: ${iso || 'N/A'}<br/>
+          🕒 Tiempo de exposición: ${exposure || 'N/A'} seg<br/>
+          ƒ Número F: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+          ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+          🔍 Longitud focal: ${focus || 'N/A'}
+        `;
+      });
+
+      fileInput.value = "";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileLabel.textContent = "Ningún archivo seleccionado";
+  }
+});
+
+// Load control thumbnails
+controlImages.forEach((src, idx) => {
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.marginBottom = '15px';
+  container.style.fontSize = '14pt';
+
+  const label = document.createElement('span');
+  label.textContent = `Nivel ${idx + 1}`;
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = 'thumb';
+  img.onclick = () => {
+    const originalSrc = latestImage.src;
+    latestImage.src = src;
+
+    let tempLabel = document.createElement('span');
+    tempLabel.textContent = `Nivel ${idx + 1}`;
+    tempLabel.style.display = 'block';
+    tempLabel.style.marginTop = '10px';
+    tempLabel.style.fontSize = '18pt';
+    tempLabel.id = 'tempLabel';
+
+    const oldLabel = document.getElementById('tempLabel');
+    if (oldLabel) oldLabel.remove();
+
+    comparisonPanel.appendChild(tempLabel);
+
+    setTimeout(() => {
+      latestImage.src = originalSrc;
+      tempLabel.remove();
+    }, 1000);
+  };
+
+  container.appendChild(img);
+  container.appendChild(label);
+  controlPanel.appendChild(container);
+});
+
+// Orientation check
+function checkOrientation() {
+  const warning = document.getElementById('rotateWarning');
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+  warning.style.display = isLandscape ? 'none' : 'block';
+}
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('load', checkOrientation);
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkOrientation, 300);
+});
+</script>
+
+</body>
+</html>
