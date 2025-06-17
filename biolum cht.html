@@ -157,14 +157,14 @@ fileInput.addEventListener('change', (event) => {
       exifData.textContent = "Leyendo datos EXIF...";
       EXIF.getData(file, function() {
         const iso = EXIF.getTag(this, 'ISOSpeedRatings');
-        const exposure = EXIF.getTag(this, 'ExposureTime');
+        const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
         const fNumber = EXIF.getTag(this, 'FNumber');
         const wb = EXIF.getTag(this, 'WhiteBalance');
         const focus = EXIF.getTag(this, 'FocalLength');
 
         exifData.innerHTML = `
           📷 ISO: ${iso || 'N/A'}<br/>
-          🕒 Tiempo de exposición: ${exposure || 'N/A'} mseg<br/>
+          🕒 Tiempo de exposición: 1/${exposure || ''} mseg<br/>
          f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
           ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
           🔍 Longitud focal: ${focus || 'N/A'}
