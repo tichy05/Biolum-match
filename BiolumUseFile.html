@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
+
+
   <title>Photo Comparison</title>
   <style>
     body {
@@ -226,6 +228,24 @@ window.addEventListener('orientationchange', () => { setTimeout(checkOrientation
 function goBack() {
   window.history.back();
 }
+
+//Android only
+function requestFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) {
+    el.requestFullscreen();
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
+  }
+}
+
+/*
+// Example: call on a button click
+document.getElementById('customBtn').addEventListener('click', requestFullscreen);
+
+
+*/
+
 
   </script>
 
