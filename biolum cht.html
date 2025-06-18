@@ -16,7 +16,6 @@
       background-color: #222;
       color: white;
     }
-
     #controlPanel {
       width: 30%;
       overflow-y: auto;
@@ -37,6 +36,7 @@
 
     #comparisonPanel {
       width: 70%;
+      height: 75%;
       background-color: #222;
       display: flex; flex-direction: column;
       align-items: center;
@@ -58,7 +58,7 @@
       border: 2px solid #17b2b8;
       color: white;
       padding: 10px;
-      border-radius: 12px;
+      border-radius: 24px;
       background-color: #222;
       margin-top: 10px;
     }
@@ -99,35 +99,39 @@
 
 <!-- Left panel -->
 <div id="controlPanel">
+<button id="langToggle" style="align-self: flex-end; 
+            margin-bottom: 5px;
+            max-width: 100px;
+            max-height: 25px;
+            border: 2px solid #17b2b8;
+            color: white;
+            padding: 4px;
+            border-radius: 12px;
+            background-color: #222;
+    
+            ">English</button>
+
   <h3>Imagenes de Control</h3>
 
-  <div id="instructions">
-    <b>Guía de Fotografía:</b><br/><br/>
-    📷 App recomendada:<br/>
-    iPhone: Halide / ProCamera<br/>
-    Android: Camera FV-5 / ProShot<br/><br/>
-
-    ⚙️ <b>Configuración:</b><br/>
-    Shutter: 1/2 a 10 seg<br/>
-    ISO: 800 - 3200<br/>
-    Balance de blancos: Fijo (daylight)<br/>
-    Enfoque: Fijo (infinito)<br/><br/>
-
-    ⬆️ Suba su foto para comparar.
+   <div id="instructions"></div>
+    
   </div>
 </div>
 
 <!-- Right panel -->
 <div id="comparisonPanel">
-  <button id="customBtn">Elegir archivo</button>
+  <button id="customBtn"></button>
   <input type="file" id="fileInput" accept="image/*" style="display:none;">
-  <span id="fileLabel">Ningún archivo seleccionado</span>
+  <span id="fileLabel"></span>
 
   <img id="latestImage" src="" alt="">
   <div id="exifData"></div>
 </div>
 
 <script>
+  
+// Up to 5 control images, can add more
+
 const controlImages = [
   'https://tichy05.github.io/Biolum-match/NIVEL 1.jpg',
   'https://tichy05.github.io/Biolum-match/NIVEL 2.jpg',
@@ -144,6 +148,8 @@ const customBtn = document.getElementById('customBtn');
 const fileLabel = document.getElementById('fileLabel');
 const latestImage = document.getElementById('latestImage');
 const exifData = document.getElementById('exifData');
+
+// Select input file, photo or take photo depending on device
 
 customBtn.onclick = () => fileInput.click();
 
@@ -180,6 +186,7 @@ fileInput.addEventListener('change', (event) => {
 });
 
 // Load control thumbnails
+
 controlImages.forEach((src, idx) => {
   const container = document.createElement('div');
   container.style.display = 'flex';
@@ -190,6 +197,8 @@ controlImages.forEach((src, idx) => {
 
   const label = document.createElement('span');
   label.textContent = `Nivel ${idx + 1}`;
+
+// Overimpose for 1 sec clicked control over sample
 
   const img = document.createElement('img');
   img.src = src;
@@ -232,6 +241,142 @@ window.addEventListener('load', checkOrientation);
 window.addEventListener('orientationchange', () => {
   setTimeout(checkOrientation, 300);
 });
+
+
+// Language data
+
+const langData = {
+  es: {
+    langBtn: "English",
+    title: "Imagenes de Control",
+    instructions: `<b>Guía de Fotografía:</b><br/><br/>
+      📷 App recomendada:<br/>
+      iPhone: Halide / ProCamera<br/>
+      Android: Camera FV-5 / ProShot<br/><br/>
+      ⚙️ <b>Configuración:</b><br/>
+      Shutter: 1/2 a 10 seg<br/>
+      ISO: 800 - 3200<br/>
+      Balance de blancos: Fijo (daylight)<br/>
+      Enfoque: Fijo (infinito)<br/><br/>
+      ⬆️ Suba su foto para comparar.`,
+    chooseFile: "Elegir archivo",
+    noFile: "Ningún archivo seleccionado",
+    rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
+    levels: idx => `Nivel ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Tiempo de exposición: 1/${exposure || ''} ms<br/>
+      f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Longitud focal: ${focus || 'N/A'}
+    `
+  },
+  en: {
+    langBtn: "Español",
+    title: "Control Images",
+    instructions: `<b>Photography Guide:</b><br/><br/>
+      📷 Recommended app:<br/>
+      iPhone: Halide / ProCamera<br/>
+      Android: Camera FV-5 / ProShot<br/><br/>
+      ⚙️ <b>Settings:</b><br/>
+      Shutter: 1/2 to 10 sec<br/>
+      ISO: 800 - 3200<br/>
+      White balance: Fixed (daylight)<br/>
+      Focus: Fixed (infinity)<br/><br/>
+      ⬆️ Upload your photo to compare.`,
+    chooseFile: "Choose file",
+    noFile: "No file selected",
+    rotate: "Please rotate your device to landscape mode",
+    levels: idx => `Level ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Exposure time: 1/${exposure || ''} ms<br/>
+      f📷   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Focal length: ${focus || 'N/A'}
+    `
+  }
+};
+
+let currentLang = 'es';
+
+function setLang(lang) {   //Español
+  currentLang = lang;
+  document.getElementById('langToggle').textContent = langData[lang].langBtn;
+  document.querySelector('#controlPanel h3').textContent = langData[lang].title;
+  document.getElementById('instructions').innerHTML = langData[lang].instructions;
+  document.getElementById('customBtn').textContent = langData[lang].chooseFile;
+  document.getElementById('fileLabel').textContent = langData[lang].noFile;
+  document.getElementById('rotateWarning').textContent = langData[lang].rotate;
+  // Update level labels
+  document.querySelectorAll('.thumb').forEach((img, idx) => {
+    img.nextSibling.textContent = langData[lang].levels(idx);
+  });
+}
+
+// Toggle language on button click
+document.getElementById('langToggle').onclick = function() {
+  setLang(currentLang === 'es' ? 'en' : 'es');
+};
+
+// Initial language setup
+window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
+
+// Update EXIF display to use language
+
+
+let lastExif = null; // Store last EXIF data
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    fileLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      latestImage.src = e.target.result;
+      exifData.textContent = "Leyendo datos EXIF...";
+      EXIF.getData(file, function() {
+        const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+        const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+        const fNumber = EXIF.getTag(this, 'FNumber');
+        const wb = EXIF.getTag(this, 'WhiteBalance');
+        const focus = EXIF.getTag(this, 'FocalLength');
+        lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
+        exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+      });
+      fileInput.value = "";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileLabel.textContent = langData[currentLang].noFile;
+    lastExif = null;
+    exifData.innerHTML = "";
+  }
+});
+
+// 
+function setLang(lang) {   //English
+  currentLang = lang;
+  document.getElementById('langToggle').textContent = langData[lang].langBtn;
+  document.querySelector('#controlPanel h3').textContent = langData[lang].title;
+  document.getElementById('instructions').innerHTML = langData[lang].instructions;
+  document.getElementById('customBtn').textContent = langData[lang].chooseFile;
+  document.getElementById('fileLabel').textContent = langData[lang].noFile;
+  document.getElementById('rotateWarning').textContent = langData[lang].rotate;
+  // Update level labels
+  document.querySelectorAll('.thumb').forEach((img, idx) => {
+    img.nextSibling.textContent = langData[lang].levels(idx);
+  });
+  // Update EXIF display language if EXIF data is present
+  if (lastExif) {
+    exifData.innerHTML = langData[lang].exif(
+      lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
+    );
+  }
+}
+
+
+
 </script>
 
 </body>
