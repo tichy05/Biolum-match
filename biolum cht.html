@@ -300,18 +300,25 @@ const langData = {
 
 let currentLang = 'es';
 
-function setLang(lang) {   //Español
+function setLang(lang) {
   currentLang = lang;
   document.getElementById('langToggle').textContent = langData[lang].langBtn;
   document.querySelector('#controlPanel h3').textContent = langData[lang].title;
   document.getElementById('instructions').innerHTML = langData[lang].instructions;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
-  document.getElementById('fileLabel').textContent = langData[lang].noFile;
+  // Show file name if present, otherwise show "no file selected"
+  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
   // Update level labels
   document.querySelectorAll('.thumb').forEach((img, idx) => {
     img.nextSibling.textContent = langData[lang].levels(idx);
   });
+  // Update EXIF display language if EXIF data is present
+  if (lastExif) {
+    exifData.innerHTML = langData[lang].exif(
+      lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
+    );
+  }
 }
 
 // Toggle language on button click
@@ -326,11 +333,14 @@ window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
 
 
 let lastExif = null; // Store last EXIF data
+let currentFileName = ""; // Store current file name
 
 fileInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
   if (file) {
-    fileLabel.textContent = file.name;
+    currentFileName = file.name;
+    fileLabel.textContent = currentFileName;
+ 
     const reader = new FileReader();
     reader.onload = (e) => {
       latestImage.src = e.target.result;
@@ -343,25 +353,28 @@ fileInput.addEventListener('change', (event) => {
         const focus = EXIF.getTag(this, 'FocalLength');
         lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
         exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+        
       });
       fileInput.value = "";
     };
     reader.readAsDataURL(file);
-  } else {
+   } else {
     fileLabel.textContent = langData[currentLang].noFile;
+    currentFileName = "";
     lastExif = null;
     exifData.innerHTML = "";
   }
 });
 
 // 
-function setLang(lang) {   //English
+function setLang(lang) {
   currentLang = lang;
   document.getElementById('langToggle').textContent = langData[lang].langBtn;
   document.querySelector('#controlPanel h3').textContent = langData[lang].title;
   document.getElementById('instructions').innerHTML = langData[lang].instructions;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
-  document.getElementById('fileLabel').textContent = langData[lang].noFile;
+  // Show file name if present, otherwise show "no file selected"
+  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
   // Update level labels
   document.querySelectorAll('.thumb').forEach((img, idx) => {
@@ -374,7 +387,6 @@ function setLang(lang) {   //English
     );
   }
 }
-
 
 
 </script>
