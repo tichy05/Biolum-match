@@ -51,7 +51,7 @@
     align-items: center;
     justify-content: center;
     width: 50%;
-    margin-top: 100px;
+    margin-top: 50px;
     margin-left: 40px;
   }
   #controlsContainer {
@@ -84,12 +84,12 @@
       max-width: 200px;
       font-size: 14pt;
       max-height: 50px;
-      border: 2px solid #17b2b8;
+      border: 2px solid red;
       color: white;
       padding: 10px;
       border-radius: 24px;
       background-color: #222;
-      margin-top: 10px;
+      margin-top: 2px;
     }
 
     #instructions {
@@ -105,7 +105,14 @@
       margin-top: 10px;
       font-size: 12pt;
       color: #0f0;
+      
     }
+
+    #langToggle {
+  background-repeat: no-repeat;
+  background-size: 24px 16px;
+  background-position: 8px center;
+}
 
     #rotateWarning {
       display: none;
@@ -128,17 +135,32 @@
 
 <!-- Left panel -->
 <div id="controlPanel">
-<button id="langToggle" style="align-self: flex-end; 
+
+<button id="langToggle" style="align-self: flex-center; 
             margin-bottom: 5px;
-            max-width: 100px;
+            max-width: 200px;
             max-height: 25px;
-            border: 2px solid #17b2b8;
+            border: 2px solid red;
+            color: white;
+            padding: 4px 4px 4px 36px; /* add left padding for flag */
+            border-radius: 12px;
+            background-color: transparent;"></button>
+
+       
+
+<button id="exifToggle" style="align-self: flex-center; 
+            margin-bottom: 5px;
+            max-width: 200px;
+            max-height: 25px;
+            border: 2px solid red;
             color: white;
             padding: 4px;
             border-radius: 12px;
             background-color: #222;
-    
-            ">English</button>
+            
+            ">EXIF On/Off</button>
+
+
 
   <h3>Imagenes de Control</h3>
 
@@ -183,6 +205,8 @@ const customBtn = document.getElementById('customBtn');
 const fileLabel = document.getElementById('fileLabel');
 const latestImage = document.getElementById('latestImage');
 const exifData = document.getElementById('exifData');
+const currentExif = 'none';
+
 
 // Select input file, photo or take photo depending on device
 
@@ -205,7 +229,7 @@ fileInput.addEventListener('change', (event) => {
 
         exifData.innerHTML = `
           📷 ISO: ${iso || 'N/A'}<br/>
-          🕒 Tiempo de exposición: 1/${exposure || ''} mseg<br/>
+          🕒 Tiempo de exposición: 1/${exposure || ''} ms<br/>
          f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
           ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
           🔍 Longitud focal: ${focus || 'N/A'}
@@ -216,7 +240,7 @@ fileInput.addEventListener('change', (event) => {
     };
     reader.readAsDataURL(file);
   } else {
-    fileLabel.textContent = "Ningún archivo seleccionado";
+    fileLabel.textContent = "Ningún archivo elegido";
   }
 });
 
@@ -252,7 +276,7 @@ controlImages.forEach((src, idx) => {
     const oldLabel = document.getElementById('tempLabel');
     if (oldLabel) oldLabel.remove();
 
-    controlsContainer.appendChild(tempLabel);
+    controlsContainer.appendChild(tempLabel); 
 
     setTimeout(() => {
       latestImage.src = originalSrc;
@@ -295,7 +319,7 @@ const langData = {
       Enfoque: Fijo (infinito)<br/><br/>
       ⬆️ Suba su foto para comparar.`,
     chooseFile: "Elegir archivo",
-    noFile: "Ningún archivo seleccionado",
+    noFile: "Ningún archivo elegido",
     rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
     levels: idx => `IB # ${idx + 1}`,
     exif: (iso, exposure, fNumber, wb, focus) => `
@@ -335,26 +359,57 @@ const langData = {
 
 let currentLang = 'es';
 
+// add flags  to lNG BUTTONS
 function setLang(lang) {
   currentLang = lang;
-  document.getElementById('langToggle').textContent = langData[lang].langBtn;
+  const langToggle = document.getElementById('langToggle');
+  langToggle.textContent = langData[lang].langBtn;
+
+  // Set flag background
+  if (lang === 'es') {
+  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg')";
+  } else {
+  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg')";
+    
+  }
+
   document.querySelector('#controlPanel h3').textContent = langData[lang].title;
   document.getElementById('instructions').innerHTML = langData[lang].instructions;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
-  // Show file name if present, otherwise show "no file selected"
   document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
-  // Update level labels
   document.querySelectorAll('.thumb').forEach((img, idx) => {
     img.nextSibling.textContent = langData[lang].levels(idx);
   });
-  // Update EXIF display language if EXIF data is present
   if (lastExif) {
     exifData.innerHTML = langData[lang].exif(
       lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
     );
   }
 }
+
+
+
+//FLAG END
+
+// Toggle EXIF Data on/off on button click
+
+document.getElementById('exifToggle').onclick = function() {
+  setExif();
+};
+
+
+// exifToggle button toggles on or off the display of EXIF data
+
+function setExif() {    
+ 
+if (exifData.style.display === '' || exifData.style.display === 'block') {
+  exifData.style.display = 'none';
+} else {
+  exifData.style.display = '';
+}};
+
+
 
 // Toggle language on button click
 document.getElementById('langToggle').onclick = function() {
@@ -400,28 +455,6 @@ fileInput.addEventListener('change', (event) => {
     exifData.innerHTML = "";
   }
 });
-
-// 
-function setLang(lang) {
-  currentLang = lang;
-  document.getElementById('langToggle').textContent = langData[lang].langBtn;
-  document.querySelector('#controlPanel h3').textContent = langData[lang].title;
-  document.getElementById('instructions').innerHTML = langData[lang].instructions;
-  document.getElementById('customBtn').textContent = langData[lang].chooseFile;
-  // Show file name if present, otherwise show "no file selected"
-  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
-  document.getElementById('rotateWarning').textContent = langData[lang].rotate;
-  // Update level labels
-  document.querySelectorAll('.thumb').forEach((img, idx) => {
-    img.nextSibling.textContent = langData[lang].levels(idx);
-  });
-  // Update EXIF display language if EXIF data is present
-  if (lastExif) {
-    exifData.innerHTML = langData[lang].exif(
-      lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
-    );
-  }
-}
 
 
 </script>
