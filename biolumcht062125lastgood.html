@@ -337,11 +337,11 @@ fileInput.addEventListener('change', (event) => {
         const focus = EXIF.getTag(this, 'FocalLength');
 
         exifData.innerHTML = `
-          ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
-          ÃÂ°ÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
-         fÃÂ°ÃÂÃÂÃÂ·   NÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
-          ÃÂ¢ÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
-          ÃÂ°ÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
+          ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+          ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
+         fÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ·   NÃÂÃÂÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+          ÃÂÃÂ¢ÃÂÃÂÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+          ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
         `;
       });
 
@@ -349,7 +349,7 @@ fileInput.addEventListener('change', (event) => {
     };
     reader.readAsDataURL(file);
   } else {
-    fileLabel.textContent = "NingÃÂÃÂºn archivo elegido";
+    fileLabel.textContent = "NingÃÂÃÂÃÂÃÂºn archivo elegido";
   }
 });
 
@@ -397,10 +397,10 @@ controlImages.forEach((src, idx) => {
   container.appendChild(label);
   controlPanel.appendChild(container);
 });
-/*
+
 // Orientation check
 function checkOrientation() {
-  const warning = document.getElementById('rotateWarning');
+  /*const warning = document.getElementById('rotateWarning');
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
   warning.style.display = isLandscape ? 'none' : 'block';
 }
@@ -417,35 +417,35 @@ const langData = {
   es: {
     langBtn: "English",
     title: "Imagenes de Control",
-    instructions: `<b>ÃÂ°ÃÂÃÂÃÂ· GuÃÂÃÂ­a de FotografÃÂÃÂ­a:</b><br/><br/>
-      1. Lleve la pantalla de su celular al mÃÂÃÂ¡ximo de brillo<br/>
-      2. Oprima Elegir ImagÃÂÃÂ©n<br/>
+    instructions: `<b>ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· GuÃÂÃÂÃÂÃÂ­a de FotografÃÂÃÂÃÂÃÂ­a:</b><br/><br/>
+      1. Lleve la pantalla de su celular al mÃÂÃÂÃÂÃÂ¡ximo de brillo<br/>
+      2. Oprima Elegir ImagÃÂÃÂÃÂÃÂ©n<br/>
       3. Seleccione Take Photo y verifique el flash este apagado<br/>
       4. Debe estar lo mas estable posible<br/>
-      5. Ponga la cÃÂÃÂ¡mara a unos tres (3) pies (91,44 cm) de la superficie 
+      5. Ponga la cÃÂÃÂÃÂÃÂ¡mara a unos tres (3) pies (91,44 cm) de la superficie 
       del agua<br/>
       6. Presione el centro de la pantalla para enfocar. Tome la foto<br/>
-      7. Si la foto saliÃÂÃÂ³ bien, presione Use, si no, Retake<br/>
-      8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Si presiona sobre las imagenes de control, se pondrÃÂÃÂ¡n encima de la muestra por un segundo, y podrÃÂÃÂ¡ comparar mejor<br/>
-      9. Una vez escoja el control mas aproximado, marcarÃÂÃÂ¡ el cuadro en blanco al lado de su nombre<br/>
+      7. Si la foto saliÃÂÃÂÃÂÃÂ³ bien, presione Use, si no, Retake<br/>
+      8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Si presiona sobre las imagenes de control, se pondrÃÂÃÂÃÂÃÂ¡n encima de la muestra por un segundo, y podrÃÂÃÂÃÂÃÂ¡ comparar mejor<br/>
+      9. Una vez escoja el control mas aproximado, marcarÃÂÃÂÃÂÃÂ¡ el cuadro en blanco al lado de su nombre<br/>
       10. Presione Enviar muestra<br/>
-      11. Si no marca el cuadro antes de enviar, se enviarÃÂÃÂ¡ la muestra sin comparaciÃÂÃÂ³n`,
-    chooseFile: "Elegir ImagÃÂÃÂ©n",
-    noFile: "NingÃÂÃÂºn archivo elegido",
+      11. Si no marca el cuadro antes de enviar, se enviarÃÂÃÂÃÂÃÂ¡ la muestra sin comparaciÃÂÃÂÃÂÃÂ³n`,
+    chooseFile: "Elegir ImagÃÂÃÂÃÂÃÂ©n",
+    noFile: "NingÃÂÃÂÃÂÃÂºn archivo elegido",
     rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
     levels: idx => `IB # ${idx + 1}`,
     exif: (iso, exposure, fNumber, wb, focus) => `
-      ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
-      ÃÂ°ÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
-      fÃÂ°ÃÂÃÂÃÂ·   NÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
-      ÃÂ¢ÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
-      ÃÂ°ÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
+      fÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ·   NÃÂÃÂÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ÃÂÃÂ¢ÃÂÃÂÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
     `
   },
   en: {
-    langBtn: "EspaÃÂÃÂ±ol",
+    langBtn: "EspaÃÂÃÂÃÂÃÂ±ol",
     title: "Control Images",
-    instructions: `<b>ÃÂ°ÃÂÃÂÃÂ· Photography Guide:</b><br/><br/>
+    instructions: `<b>ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· Photography Guide:</b><br/><br/>
       1. Set your smartphone to max screen brilliance<br/>
       2. Press Select Image<br/>
       3. Select Take Photo an verify the flash is off<br/>
@@ -462,11 +462,11 @@ const langData = {
     rotate: "Please rotate your device to landscape mode",
     levels: idx => `IB # ${idx + 1}`,
     exif: (iso, exposure, fNumber, wb, focus) => `
-      ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
-      ÃÂ°ÃÂÃÂÃÂ Exposure time: 1/${exposure || ''} ms<br/>
-      fÃÂ°ÃÂÃÂÃÂ·   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
-      ÃÂ¢ÃÂÃÂª White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
-      ÃÂ°ÃÂÃÂÃÂ Focal length: ${focus || 'N/A'}
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Exposure time: 1/${exposure || ''} ms<br/>
+      fÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ·   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ÃÂÃÂ¢ÃÂÃÂÃÂÃÂª White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ Focal length: ${focus || 'N/A'}
     `
   }
 };
