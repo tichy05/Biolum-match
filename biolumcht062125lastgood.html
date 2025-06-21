@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Bioluminescence Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      display: flex; flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+      background-color: #222;
+      color: #888
+    }
+    #controlPanel {
+      width: 30%;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      background-color: #222;
+    }
+
+    .thumb {
+      width: 80%;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+    .thumb:hover { border-color: rgb(96, 186, 186); }
+
+    #comparisonPanel {
+    width:75%;
+    height: 75%;
+    background-color: #222;
+    display: flex; /* changed from column to row */
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 50px;
+    font-size: 16pt;
+    color: #888;
+    gap: 32px; /* space between image and controls */
+  }
+  #imageContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    margin-top: 50px;
+    margin-left: 40px;
+  }
+  #controlsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-width: 30%;
+    max-width: 35%;
+    gap: 12px;
+    margin-left: 24px;
+    margin-top: 0spx;
+    font-size: 12pt;
+    color: #888;
+  
+  #fileLabel {
+  display: block;
+  max-width: 100%;
+  word-break: break-all;
+  white-space: normal;
+}
+  }
+  #latestImage {
+    max-width: 100%;
+    max-height: 65vh;
+    border: 5px solid #fff;
+  }
+
+    #customBtn {
+      max-width: 200px;
+      font-size: 14pt;
+      max-height: 50px;
+      border: 2px solid rgb(96, 186, 186);
+      color: #888;
+      padding: 10px;
+      border-radius: 24px;
+      background-color: #222;
+      margin-top: 2px;
+    }
+
+    #instructions {
+      font-size: 14pt;
+      margin: 20px 10px;
+      text-align: left;
+      background-color: #222;
+      padding: 10px;
+      border-radius: 10px;
+      color:#888;
+    }
+
+    #exifData {
+      margin-top: 10px;
+      font-size: 12pt;
+      color: #0f0;
+      
+    }
+
+    #langToggle {
+  background-repeat: no-repeat;
+  background-size: 24px 16px;
+  background-position: 8px center;
+}
+
+#configForm input[type="text"], 
+#configForm input[type="email"] {
+  width: 95%;
+  height: 50%;
+
+  font-size: 12pt;
+  padding: 8px 10px;
+  margin: 6px 0 12px 0;
+  border-radius: 8px;
+  border: 1px solid #888;
+  background: #333;
+  color: #fff;
+  box-sizing: border-box;
+  transition: border 0.2s;
+}
+#configForm input[type="text"]:focus, 
+#configForm input[type="email"]:focus {
+  border: 2px solid #f44;
+  outline: none;
+  background: #222;
+}
+#configForm label {
+  font-size: 14pt;
+  margin-bottom: 8px;
+  display: block;
+}
+#configForm button {
+  font-size: 14pt;
+  padding: 8px 24px;
+  margin-right: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #444;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#configForm button:hover {
+  background: #f44;
+}
+
+
+    #rotateWarning {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000000cc;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      padding-top: 10vh;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="rotateWarning">Por favor, gire su dispositivo a modo horizontal (landscape)</div>
+
+<!-- Left panel -->
+<div id="controlPanel">
+
+<button id="langToggle" style="align-self: flex-center; 
+            margin-bottom: 5px;
+            max-width: 200px;
+            max-height: 35px;
+            border: 2px solid rgb(96, 186, 186);
+            color: #888;
+            padding: 4px 4px 4px 36px; /* add left padding for flag */
+            border-radius: 24px;
+            font-size: 14pt;
+            background-color: transparent;"></button>
+
+       
+<button id="Config" style="align-self: flex-center; 
+            margin-bottom: 5px;
+            max-width: 200px;
+            max-height: 35px;
+            border: 2px solid rgb(96, 186, 186);
+            color: #888;
+            padding: 4px;
+            border-radius: 24px;
+            font-size: 14pt;
+            background-color: #222;
+            
+            ">Config</button> 
+                    
+
+  <h3>Imagenes de Control</h3>
+
+   <div id="instructions"></div>
+    
+  </div>
+</div>
+
+<!-- Right panel -->
+<div id="comparisonPanel">
+  <div id="imageContainer">
+  <img id="latestImage" src="" alt="">
+</div>
+<div id="controlsContainer"> 
+  <button id="customBtn"></button><br>
+  <input type="file" id="fileInput" accept="image/*" style="display:none;">
+  <span id="fileLabel"></span>
+  <div id="exifData"></div>
+  </div>
+</div>
+
+
+<div id="configModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000a; z-index:10000; align-items:center; justify-content:center;">
+<form id="configForm" style="background:#222; color:white; padding:24px; border-radius:16px; min-width:500px;">
+    <h2>Config</h2>
+    <label>Control Image URLs or file names:<br>
+  <input type="text" name="img0" placeholder="URL or file for IB #1">
+  <input type="text" name="img1" placeholder="URL or file for IB #2">
+  <input type="text" name="img2" placeholder="URL or file for IB #3">
+  <input type="text" name="img3" placeholder="URL or file for IB #4">
+  <input type="text" name="img4" placeholder="URL or file for IB #5">
+</label><br>
+    <label>
+      Show EXIF (image details):
+      <input type="checkbox" name="exifOn" checked>
+    </label><br>
+    <label>
+      Email to send data: <input type="email" name="email" placeholder="CollectionCenter@email.com">
+    </label><br>
+    <button type="submit">Save</button>
+    <button type="button" onclick="closeConfig()">Cancel</button>
+  </form>
+</div>
+  
+
+
+<script>
+  
+// Up to 5 control images, can add more
+
+// Store config variables
+let controlImages = [
+  'https://tichy05.github.io/Biolum-match/NIVEL 1.jpg', 
+  'https://tichy05.github.io/Biolum-match/NIVEL 2.jpg', 
+  'https://tichy05.github.io/Biolum-match/NIVEL 3.jpg',
+  'https://tichy05.github.io/Biolum-match/NIVEL 4.jpg', 
+  'https://tichy05.github.io/Biolum-match/NIVEL 5.jpg' 
+  'https://tichy05.github.io/Biolum-match/NIVEL 6.jpg' 
+
+];
+let exifEnabled = true;
+let emailName = "";
+
+// Load config from localStorage if available
+function loadConfig() {
+  const saved = localStorage.getItem('biolumConfig');
+  if (saved) {
+    const cfg = JSON.parse(saved);
+    if (Array.isArray(cfg.controlImages)) controlImages = cfg.controlImages;
+    if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
+    if (typeof cfg.emailName === "string") emailName = cfg.emailName;
+  }
+}
+loadConfig();
+
+// close config form
+function closeConfig() {
+  document.getElementById('configModal').style.display = 'none';
+}
+
+
+// Save config to localStorage
+function saveConfig() {
+  localStorage.setItem('biolumConfig', JSON.stringify({
+    controlImages, exifEnabled, emailName
+  }));
+}
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(currentLang);
+  reloadControlThumbnails();
+  exifData.style.display = exifEnabled ? '' : 'none';
+});
+
+
+const controlPanel = document.getElementById('controlPanel');
+const comparisonPanel = document.getElementById('comparisonPanel');
+const fileInput = document.getElementById('fileInput');
+const customBtn = document.getElementById('customBtn');
+const fileLabel = document.getElementById('fileLabel');
+const latestImage = document.getElementById('latestImage');
+const exifData = document.getElementById('exifData');
+const currentExif = 'none';
+
+window.addEventListener('DOMContentLoaded', () => {
+  setLang(currentLang);
+  reloadControlThumbnails();
+  exifData.style.display = exifEnabled ? '' : 'none';
+});
+
+
+
+// Select input file, photo or take photo depending on device
+
+customBtn.onclick = () => fileInput.click();
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    fileLabel.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      latestImage.src = e.target.result;
+      exifData.textContent = "Leyendo datos EXIF...";
+      EXIF.getData(file, function() {
+        const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+        const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+        const fNumber = EXIF.getTag(this, 'FNumber');
+        const wb = EXIF.getTag(this, 'WhiteBalance');
+        const focus = EXIF.getTag(this, 'FocalLength');
+
+        exifData.innerHTML = `
+          ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+          ÃÂ°ÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
+         fÃÂ°ÃÂÃÂÃÂ·   NÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+          ÃÂ¢ÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+          ÃÂ°ÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
+        `;
+      });
+
+      fileInput.value = "";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileLabel.textContent = "NingÃÂÃÂºn archivo elegido";
+  }
+});
+
+// Load control thumbnails
+
+controlImages.forEach((src, idx) => {
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
+  container.style.marginBottom = '15px';
+  container.style.fontSize = '14pt';
+
+  const label = document.createElement('span');
+  label.textContent = `IB # ${idx + 1}`;
+
+// Overimpose for 1 sec clicked control over sample
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.className = 'thumb';
+  img.onclick = () => {
+    const originalSrc = latestImage.src;
+    latestImage.src = src;
+
+    let tempLabel = document.createElement('span');
+    label.textContent = controlNames[idx];
+    tempLabel.style.display = 'block';
+    tempLabel.style.marginTop = '10px';
+    tempLabel.style.fontSize = '18pt';
+    tempLabel.id = 'tempLabel';
+
+    const oldLabel = document.getElementById('tempLabel');
+    if (oldLabel) oldLabel.remove();
+
+    controlsContainer.appendChild(tempLabel); 
+
+    setTimeout(() => {
+      latestImage.src = originalSrc;
+      tempLabel.remove();
+    }, 1000);
+  };
+
+  container.appendChild(img);
+  container.appendChild(label);
+  controlPanel.appendChild(container);
+});
+/*
+// Orientation check
+function checkOrientation() {
+  const warning = document.getElementById('rotateWarning');
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+  warning.style.display = isLandscape ? 'none' : 'block';
+}
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('load', checkOrientation);
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkOrientation, 300);
+});
+*/
+
+// Language data
+
+const langData = {
+  es: {
+    langBtn: "English",
+    title: "Imagenes de Control",
+    instructions: `<b>ÃÂ°ÃÂÃÂÃÂ· GuÃÂÃÂ­a de FotografÃÂÃÂ­a:</b><br/><br/>
+      1. Lleve la pantalla de su celular al mÃÂÃÂ¡ximo de brillo<br/>
+      2. Oprima Elegir ImagÃÂÃÂ©n<br/>
+      3. Seleccione Take Photo y verifique el flash este apagado<br/>
+      4. Debe estar lo mas estable posible<br/>
+      5. Ponga la cÃÂÃÂ¡mara a unos tres (3) pies (91,44 cm) de la superficie 
+      del agua<br/>
+      6. Presione el centro de la pantalla para enfocar. Tome la foto<br/>
+      7. Si la foto saliÃÂÃÂ³ bien, presione Use, si no, Retake<br/>
+      8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Si presiona sobre las imagenes de control, se pondrÃÂÃÂ¡n encima de la muestra por un segundo, y podrÃÂÃÂ¡ comparar mejor<br/>
+      9. Una vez escoja el control mas aproximado, marcarÃÂÃÂ¡ el cuadro en blanco al lado de su nombre<br/>
+      10. Presione Enviar muestra<br/>
+      11. Si no marca el cuadro antes de enviar, se enviarÃÂÃÂ¡ la muestra sin comparaciÃÂÃÂ³n`,
+    chooseFile: "Elegir ImagÃÂÃÂ©n",
+    noFile: "NingÃÂÃÂºn archivo elegido",
+    rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
+    levels: idx => `IB # ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+      ÃÂ°ÃÂÃÂÃÂ Tiempo de exposiciÃÂÃÂ³n: 1/${exposure || ''} ms<br/>
+      fÃÂ°ÃÂÃÂÃÂ·   NÃÂÃÂºmero f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ÃÂ¢ÃÂÃÂª Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      ÃÂ°ÃÂÃÂÃÂ Longitud focal: ${focus || 'N/A'}
+    `
+  },
+  en: {
+    langBtn: "EspaÃÂÃÂ±ol",
+    title: "Control Images",
+    instructions: `<b>ÃÂ°ÃÂÃÂÃÂ· Photography Guide:</b><br/><br/>
+      1. Set your smartphone to max screen brilliance<br/>
+      2. Press Select Image<br/>
+      3. Select Take Photo an verify the flash is off<br/>
+      4. You must be as stabilized as ppossible<br/>
+      5. Hold the camero about three (3) feet (91,44 cm) from the water's surface<br/>
+      6. Press the screen at the center to focus.  Take the picture<br/>
+      7. If the image looks ok, press Use, else Retake<br/>
+      8. You will try to match the brilliance of the sample taken, with the control images on your left.  You can press on the control images, they will cover the sample for a second, and it's easier to see the difference<br/>
+      9. Once you select the most aproximate control image, you can mark the white square besides their name<br/>
+      10. Press Send Sample<br/>
+      11. If the control is not marked, the image will be sent unmatched`,
+    chooseFile: "Choose Image",
+    noFile: "No file selected",
+    rotate: "Please rotate your device to landscape mode",
+    levels: idx => `IB # ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      ÃÂ°ÃÂÃÂÃÂ· ISO: ${iso || 'N/A'}<br/>
+      ÃÂ°ÃÂÃÂÃÂ Exposure time: 1/${exposure || ''} ms<br/>
+      fÃÂ°ÃÂÃÂÃÂ·   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ÃÂ¢ÃÂÃÂª White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      ÃÂ°ÃÂÃÂÃÂ Focal length: ${focus || 'N/A'}
+    `
+  }
+};
+
+let currentLang = 'es';
+
+// add flags  to lNG BUTTONS
+function setLang(lang) {
+  currentLang = lang;
+  const langToggle = document.getElementById('langToggle');
+  langToggle.textContent = langData[lang].langBtn;
+  
+ 
+  // Set flag background
+  if (lang === 'es') {
+  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg')";
+  } else {
+  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg')";
+    
+  }
+
+  document.querySelector('#controlPanel h3').textContent = langData[lang].title;
+  document.getElementById('instructions').innerHTML = langData[lang].instructions;
+  document.getElementById('customBtn').textContent = langData[lang].chooseFile;
+  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
+  document.getElementById('rotateWarning').textContent = langData[lang].rotate;
+  document.querySelectorAll('.thumb').forEach((img, idx) => {
+    img.nextSibling.textContent = langData[lang].levels(idx);
+  });
+  if (lastExif) {
+    exifData.innerHTML = langData[lang].exif(
+      lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
+    );
+  }
+}
+
+
+
+//FLAG END
+
+
+// Settings *******
+document.getElementById('Config').onclick = function() {
+  openConfig();
+};
+
+   
+ 
+
+
+// Toggle EXIF Data on/off on button click
+/*
+document.getElementById('exifToggle').onclick = function() {
+  setExif();
+}; 
+
+
+// exifToggle button toggles on or off the display of EXIF data
+
+function setExif() {    
+ 
+if (exifData.style.display === '' || exifData.style.display === 'block') {
+  exifData.style.display = 'none';
+} else {
+  exifData.style.display = '';
+}};
+
+*/
+
+// Toggle language on button click
+document.getElementById('langToggle').onclick = function() {
+  setLang(currentLang === 'es' ? 'en' : 'es');
+};
+
+// Initial language setup
+window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
+
+// Update EXIF display to use language
+
+
+let lastExif = null; // Store last EXIF data
+let currentFileName = ""; // Store current file name
+
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    currentFileName = file.name;
+    fileLabel.textContent = currentFileName;
+ 
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      latestImage.src = e.target.result;
+      exifData.textContent = "Leyendo datos EXIF...";
+      EXIF.getData(file, function() {
+        const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+        const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+        const fNumber = EXIF.getTag(this, 'FNumber');
+        const wb = EXIF.getTag(this, 'WhiteBalance');
+        const focus = EXIF.getTag(this, 'FocalLength');
+        lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
+        exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+        
+      });
+      fileInput.value = "";
+    };
+    reader.readAsDataURL(file);
+   } else {
+    fileLabel.textContent = langData[currentLang].noFile;
+    currentFileName = "";
+    lastExif = null;
+    exifData.innerHTML = "";
+  }
+});
+
+// CONFIG MODAL ****
+
+
+
+// Show config modal
+function openConfig() {
+  const form = document.getElementById('configForm');
+  for (let i = 0; i < 5; i++) {
+    form['img'+i].value = controlImages[i] || '';
+  }
+  form.exifOn.checked = exifEnabled;
+  form.email.value = emailName || '';
+  document.getElementById('configModal').style.display = 'flex';
+}
+
+// Handle config form submit
+document.getElementById('configForm').onsubmit = function(e) {
+  e.preventDefault();
+  for (let i = 0; i < 5; i++) {
+    controlImages[i] = this['img'+i].value || '';
+  }
+  exifEnabled = this.exifOn.checked;
+  emailName = this.email.value;
+  saveConfig();
+  closeConfig();
+  reloadControlThumbnails();
+  exifData.style.display = exifEnabled ? '' : 'none';
+};
+
+function reloadControlThumbnails() {
+  // Remove old thumbnails
+  document.querySelectorAll('.thumb').forEach(el => el.parentNode.remove());
+  // Add new thumbnails
+  controlImages.forEach((src, idx) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.marginBottom = '15px';
+    container.style.fontSize = '14pt';
+
+    const label = document.createElement('span');
+    label.textContent = `IB # ${idx + 1}`;
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'thumb';
+    img.onclick = () => {
+      const originalSrc = latestImage.src;
+      latestImage.src = src;
+
+      let tempLabel = document.createElement('span');
+      tempLabel.textContent = `IB # ${idx + 1}`;
+      tempLabel.style.display = 'block';
+      tempLabel.style.marginTop = '10px';
+      tempLabel.style.fontSize = '18pt';
+      tempLabel.id = 'tempLabel';
+
+      const oldLabel = document.getElementById('tempLabel');
+      if (oldLabel) oldLabel.remove();
+
+      controlsContainer.appendChild(tempLabel); 
+
+      setTimeout(() => {
+        latestImage.src = originalSrc;
+        tempLabel.remove();
+      }, 1000);
+    };
+
+    container.appendChild(img);
+    container.appendChild(label);
+    controlPanel.appendChild(container);
+  });
+}
+
+</script>
+
+</body>
+</html>
