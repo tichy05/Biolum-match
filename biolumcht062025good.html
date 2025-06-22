@@ -13,6 +13,7 @@
       height: 100vh;
       overflow: hidden;
       font-family: sans-serif;
+      font-weight: 100;
       background-color: #222;
       color: #888
     }
@@ -92,8 +93,25 @@
       border-radius: 24px;
       background-color: #222;
       margin-top: 2px;
+      
     }
-
+#customBtn:hover {
+  border-color: #888;
+}
+  #customBtn2 {
+      max-width: 200px;
+      font-size: 14pt;
+      max-height: 50px;
+      border: 2px solid rgb(96, 186, 186);
+      color: #888;
+      padding: 10px;
+      border-radius: 24px;
+      background-color: #222;
+      margin-top: 25px;
+    }
+#customBtn2:hover {
+  border-color: #888;
+}
     #instructions {
       font-size: 14pt;
       margin: 20px 10px;
@@ -114,15 +132,21 @@
     #langToggle {
   background-repeat: no-repeat;
   background-size: 24px 16px;
-  background-position: 8px center;
+  background-position: 24px 5px;
 }
+#configForm {
+  width: 100%;
+  max-width: 360px;
+  min-width: 220px;
+  box-sizing: border-box;
+}
+
+
 
 #configForm input[type="text"], 
 #configForm input[type="email"] {
   width: 95%;
-  height: 50%;
-
-  font-size: 12pt;
+  font-size: 10pt;
   padding: 8px 10px;
   margin: 6px 0 12px 0;
   border-radius: 8px;
@@ -139,12 +163,12 @@
   background: #222;
 }
 #configForm label {
-  font-size: 14pt;
+  font-size: 12pt;
   margin-bottom: 8px;
   display: block;
 }
 #configForm button {
-  font-size: 14pt;
+  font-size: 12pt;
   padding: 8px 24px;
   margin-right: 12px;
   border-radius: 8px;
@@ -155,8 +179,31 @@
   transition: background 0.2s;
 }
 #configForm button:hover {
-  background: #f44;
+  background: rgb(96, 186, 186);
 }
+/* Portrait modal for config */
+#configModal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 95vw;
+  max-width: 400px;
+  min-width: 260px;
+  height: 90vh;
+  max-height: 600px;
+  min-height: 350px;
+  background: #000a;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  border-radius: 16px;
+  flex-direction: column;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
 
 
     #rotateWarning {
@@ -181,30 +228,30 @@
 <!-- Left panel -->
 <div id="controlPanel">
 
-<button id="langToggle" style="align-self: flex-center; 
+<button id="langToggle" style="align-self: normal; 
             margin-bottom: 5px;
+            margin-left: 65px;
             max-width: 200px;
             max-height: 35px;
             border: 2px solid rgb(96, 186, 186);
             color: #888;
-            padding: 4px 4px 4px 36px; /* add left padding for flag */
+            padding: 4px 4px 4x 36px; /* add left padding for flag */
             border-radius: 24px;
             font-size: 14pt;
             background-color: transparent;"></button>
 
        
-<button id="Config" style="align-self: flex-center; 
+<button id="Config" style="align-self: normal; 
             margin-bottom: 5px;
+            margin-left: 65px;
             max-width: 200px;
             max-height: 35px;
             border: 2px solid rgb(96, 186, 186);
             color: #888;
-            padding: 4px;
+            padding: 4px 4px 4x 36px;
             border-radius: 24px;
             font-size: 14pt;
-            background-color: #222;
-            
-            ">Config</button> 
+            background-color: #222;">Config</button> 
                     
 
   <h3>Imagenes de Control</h3>
@@ -218,18 +265,24 @@
 <div id="comparisonPanel">
   <div id="imageContainer">
   <img id="latestImage" src="" alt="">
+  
 </div>
 <div id="controlsContainer"> 
   <button id="customBtn"></button><br>
   <input type="file" id="fileInput" accept="image/*" style="display:none;">
   <span id="fileLabel"></span>
   <div id="exifData"></div>
+ 
+<button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
+
   </div>
 </div>
+ 
+     
+   <div id="configModal">
 
-<!-- Add before </body> -->
-<div id="configModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000a; z-index:10000; align-items:center; justify-content:center;">
-  <form id="configForm" style="background:#222; color:white; padding:24px; border-radius:16px; min-width:500px;">
+
+<form id="configForm" style="background:#222; font-size: 10pt; color:white; padding:12px; border-radius:16px;">
     <h2>Config</h2>
     <label>Control Image URLs or file names:<br>
   <input type="text" name="img0" placeholder="URL or file for IB #1">
@@ -243,7 +296,7 @@
       <input type="checkbox" name="exifOn" checked>
     </label><br>
     <label>
-      Email to send data: <input type="email" name="email" placeholder="CollectionCenter@email.com">
+      Email to send data to: <input type="email" name="email" placeholder="CollectionCenter@email.com">
     </label><br>
     <button type="submit">Save</button>
     <button type="button" onclick="closeConfig()">Cancel</button>
@@ -302,6 +355,7 @@ const controlPanel = document.getElementById('controlPanel');
 const comparisonPanel = document.getElementById('comparisonPanel');
 const fileInput = document.getElementById('fileInput');
 const customBtn = document.getElementById('customBtn');
+const customBtn2 = document.getElementById('customBtn2');
 const fileLabel = document.getElementById('fileLabel');
 const latestImage = document.getElementById('latestImage');
 const exifData = document.getElementById('exifData');
@@ -395,9 +449,29 @@ controlImages.forEach((src, idx) => {
   container.appendChild(label);
   controlPanel.appendChild(container);
 });
-
-// Orientation check
 function checkOrientation() {
+  const warning = document.getElementById('rotateWarning');
+  const configModal = document.getElementById('configModal');
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+
+  warning.style.display = isLandscape ? 'none' : 'block';
+
+  // If config modal is open, force portrait aspect and center
+  if (configModal.style.display !== 'none') {
+    configModal.style.width = '95vw';
+    configModal.style.maxWidth = '400px';
+    configModal.style.minWidth = '260px';
+    configModal.style.height = '90vh';
+    configModal.style.maxHeight = '600px';
+    configModal.style.minHeight = '350px';
+    configModal.style.top = '50%';
+    configModal.style.left = '50%';
+    configModal.style.transform = 'translate(-50%, -50%)';
+    configModal.style.overflowY = 'auto';
+  }
+}
+// Orientation check
+/*function checkOrientation() {
   const warning = document.getElementById('rotateWarning');
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
   warning.style.display = isLandscape ? 'none' : 'block';
@@ -407,8 +481,25 @@ window.addEventListener('load', checkOrientation);
 window.addEventListener('orientationchange', () => {
   setTimeout(checkOrientation, 300);
 });
+//added
 
+  const warning = document.getElementById('rotateWarning');
+  const configModal = document.getElementById('configModal');
+  const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
+  warning.style.display = isLandscape ? 'none' : 'block';
+
+  // If config modal is open, force it to portrait aspect and center
+  if (configModal.style.display !== 'none') {
+    configModal.style.width = isLandscape ? '400px' : '90vw';
+    configModal.style.height = isLandscape ? '600px' : '80vh';
+    configModal.style.maxWidth = '400px';
+    configModal.style.maxHeight = '600px';
+    configModal.style.top = '50%';
+    configModal.style.left = '50%';
+    configModal.style.transform = 'translate(-50%, -50%)';
+  }
+*/
 // Language data
 
 const langData = {
@@ -418,17 +509,18 @@ const langData = {
     instructions: `<b>📷 Guía de Fotografía:</b><br/><br/>
       1. Lleve la pantalla de su celular al máximo de brillo<br/>
       2. Oprima Elegir Imagén<br/>
-      3. Seleccione Take Photo y verifique el flash este apagado<br/>
-      4. Debe estar lo mas estable posible<br/>
+      3. Seleccione "Take Photo" y verifique el "flash" este apagado<br/>
+      4. Usted debe estar lo mas estable posible<br/>
       5. Ponga la cámara a unos tres (3) pies (91,44 cm) de la superficie 
       del agua<br/>
-      6. Presione el centro de la pantalla para enfocar. Tome la foto<br/>
-      7. Si la foto salió bien, presione Use, si no, Retake<br/>
+      6. Enfoque la cámara y tome la foto<br/>
+      7. Si la foto salió bien, presione "Use", si no, "Retake"<br/>
       8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Si presiona sobre las imagenes de control, se pondrán encima de la muestra por un segundo, y podrá comparar mejor<br/>
-      9. Una vez escoja el control mas aproximado, marcará el cuadro en blanco al lado de su nombre<br/>
-      10. Presione Enviar muestra<br/>
-      11. Si no marca el cuadro antes de enviar, se enviará la muestra sin comparación`,
+      9. Una vez escoja el control mas aproximado, marcará el cuadro en blanco debajo de su nombre<br/>
+      10. Presione "Enviar Muestra"<br/>
+      11. Si no marca ningún cuadro antes de enviar, se enviará la muestra sin comparación`,
     chooseFile: "Elegir Imagén",
+    sendSample: "Enviar Muestra",
     noFile: "Ningún archivo elegido",
     rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
     levels: idx => `IB # ${idx + 1}`,
@@ -445,17 +537,18 @@ const langData = {
     title: "Control Images",
     instructions: `<b>📷 Photography Guide:</b><br/><br/>
       1. Set your smartphone to max screen brilliance<br/>
-      2. Press Select Image<br/>
-      3. Select Take Photo an verify the flash is off<br/>
-      4. You must be as stabilized as ppossible<br/>
-      5. Hold the camero about three (3) feet (91,44 cm) from the water's surface<br/>
-      6. Press the screen at the center to focus.  Take the picture<br/>
-      7. If the image looks ok, press Use, else Retake<br/>
+      2. Press "Select Image"<br/>
+      3. Select "Take Photo" and verify the flash is off<br/>
+      4. You must be as stabilized as posible<br/>
+      5. Hold the camera about three (3) feet (91,44 cm) from the water's surface<br/>
+      6. Focus the camera and take the picture<br/>
+      7. If the image looks ok, press "Use", else "Retake"<br/>
       8. You will try to match the brilliance of the sample taken, with the control images on your left.  You can press on the control images, they will cover the sample for a second, and it's easier to see the difference<br/>
       9. Once you select the most aproximate control image, you can mark the white square besides their name<br/>
-      10. Press Send Sample<br/>
+      10. Press "Send Sample"<br/>
       11. If the control is not marked, the image will be sent unmatched`,
     chooseFile: "Choose Image",
+    sendSample: "Send Sample",
     noFile: "No file selected",
     rotate: "Please rotate your device to landscape mode",
     levels: idx => `IB # ${idx + 1}`,
@@ -472,35 +565,34 @@ const langData = {
 let currentLang = 'es';
 
 // add flags  to lNG BUTTONS
+
 function setLang(lang) {
   currentLang = lang;
   const langToggle = document.getElementById('langToggle');
   langToggle.textContent = langData[lang].langBtn;
-  
- 
+
   // Set flag background
   if (lang === 'es') {
-  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg')";
+    langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg')";
   } else {
-  langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg')";
-    
+    langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg')";
   }
 
   document.querySelector('#controlPanel h3').textContent = langData[lang].title;
   document.getElementById('instructions').innerHTML = langData[lang].instructions;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
+  document.getElementById('customBtn2').textContent = langData[lang].sendSample;
   document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
-  document.querySelectorAll('.thumb').forEach((img, idx) => {
-    img.nextSibling.textContent = langData[lang].levels(idx);
-  });
+
+  reloadControlThumbnails(); // <-- Rebuild thumbnails with correct labels
+
   if (lastExif) {
     exifData.innerHTML = langData[lang].exif(
       lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
     );
   }
 }
-
 
 
 //FLAG END
@@ -581,8 +673,6 @@ fileInput.addEventListener('change', (event) => {
 
 // CONFIG MODAL ****
 
-
-
 // Show config modal
 function openConfig() {
   const form = document.getElementById('configForm');
@@ -608,6 +698,7 @@ document.getElementById('configForm').onsubmit = function(e) {
   exifData.style.display = exifEnabled ? '' : 'none';
 };
 
+
 function reloadControlThumbnails() {
   // Remove old thumbnails
   document.querySelectorAll('.thumb').forEach(el => el.parentNode.remove());
@@ -615,20 +706,33 @@ function reloadControlThumbnails() {
   controlImages.forEach((src, idx) => {
     const container = document.createElement('div');
     container.style.display = 'flex';
-    container.style.flexDirection = 'column';
+    container.style.flexDirection = 'column'; // column for checkbox + label + image
     container.style.alignItems = 'center';
     container.style.marginBottom = '15px';
     container.style.fontSize = '14pt';
 
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'controlCheckbox';
+    checkbox.class = 'single-selection-checkbox';
+    checkbox.value = idx;
+    checkbox.style.marginRight = '8px';
+
+    // Label
     const label = document.createElement('span');
     label.textContent = `IB # ${idx + 1}`;
+    label.style.marginRight = '8px';
 
+    // Image
     const img = document.createElement('img');
     img.src = src;
     img.className = 'thumb';
     img.onclick = () => {
       const originalSrc = latestImage.src;
       latestImage.src = src;
+   
+
 
       let tempLabel = document.createElement('span');
       tempLabel.textContent = `IB # ${idx + 1}`;
@@ -647,12 +751,41 @@ function reloadControlThumbnails() {
         tempLabel.remove();
       }, 1000);
     };
-
+    // Show control image, label and checkbox
     container.appendChild(img);
     container.appendChild(label);
+    container.appendChild(checkbox);
+
+checkbox.addEventListener('change', function() {
+  if (this.checked) {
+    document.querySelectorAll('input[name="controlCheckbox"]').forEach(cb => {
+      if (cb !== this) cb.checked = false;
+    });
+  }
+});
+
+
     controlPanel.appendChild(container);
   });
 }
+//this function needs work  emaik? save file? txt msg?
+//Send Sample button comes here, takes the identifier of the control image selected
+//and sends it along the sample photo
+
+
+function getCheckedControlIndex() {
+  const checkboxes = document.getElementsByName('controlCheckbox');
+  for (let i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
+      return parseInt(checkboxes[i].value, 10); // returns the index of the checked control   
+    }
+  }
+  return null; // none checked
+}
+
+ 
+   
+
 
 </script>
 
