@@ -216,7 +216,8 @@
       font-size: 24px;
       text-align: center;
       padding-top: 10vh;
-      z-index: 9999;
+      z-index: 99999;
+      pointer-events: all;
     }
   </style>
 </head>
@@ -334,7 +335,8 @@ loadConfig();
 
 // close config form
 function closeConfig() {
-  document.getElementById('configModal').style.display = 'none';
+ document.getElementById('configModal').style.display = 'none';
+ document.body.style.overflow = ''; // Restore scroll
 }
 
 
@@ -456,7 +458,6 @@ function checkOrientation() {
 
   warning.style.display = isLandscape ? 'none' : 'block';
 
-  // If config modal is open, force portrait aspect and center
   if (configModal.style.display !== 'none') {
     configModal.style.width = '95vw';
     configModal.style.maxWidth = '400px';
@@ -464,13 +465,36 @@ function checkOrientation() {
     configModal.style.height = '90vh';
     configModal.style.maxHeight = '600px';
     configModal.style.minHeight = '350px';
-    configModal.style.top = '50%';
-    configModal.style.left = '50%';
-    configModal.style.transform = 'translate(-50%, -50%)';
     configModal.style.overflowY = 'auto';
+
+    if (isLandscape) {
+      configModal.style.top = '0';
+      configModal.style.left = '50%';
+      configModal.style.transform = 'translateX(-50%)';
+      configModal.style.alignItems = 'flex-start';
+      configModal.style.justifyContent = 'flex-start';
+    } else {
+      configModal.style.top = '50%';
+      configModal.style.left = '50%';
+      configModal.style.transform = 'translate(-50%, -50%)';
+      configModal.style.alignItems = 'center';
+      configModal.style.justifyContent = 'center';
+    }
   }
 }
-// Orientation check
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('load', checkOrientation);
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkOrientation, 300);
+});
+// end Orientation check
+
+
+
+
+
+
+
 /*function checkOrientation() {
   const warning = document.getElementById('rotateWarning');
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
@@ -480,7 +504,7 @@ window.addEventListener('resize', checkOrientation);
 window.addEventListener('load', checkOrientation);
 window.addEventListener('orientationchange', () => {
   setTimeout(checkOrientation, 300);
-});
+});}
 //added
 
   const warning = document.getElementById('rotateWarning');
@@ -682,6 +706,7 @@ function openConfig() {
   form.exifOn.checked = exifEnabled;
   form.email.value = emailName || '';
   document.getElementById('configModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // Block background scroll
 }
 
 // Handle config form submit
