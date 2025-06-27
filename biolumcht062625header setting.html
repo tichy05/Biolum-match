@@ -239,6 +239,15 @@
       margin-left:  100px;  
       display: block;
       cursor: pointer;
+}
+.username{
+      font-size: 12pt;
+      font-weight: 400;
+      color: #222;
+      float: left;
+      margin-left:  100px;  
+      display: block;
+     
       
     }
 
@@ -255,11 +264,7 @@
       padding-top: 10vh;
       z-index: 99999;
       pointer-events: all;
-  background-repeat: no-repeat;
-      background-position: center;
       background-color: transparent;
-      background-size: 200px 200px;
-      background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
 
 
 
@@ -283,12 +288,17 @@
       background-color: transparent"></button>
 
       <span id="showInstr" class="showInstr" onclick="showInstructions()">INSTRUCCIONES</span>
-  </div>
+      <!--<span id="username" class="username">numuser:username</span> -->
+      <span id="username" class="username"><span id="numuserLabel"></span> <span id="usernameValue"></span></span>
+      <p id="dateToday" class="username"></p>
+     
+      
+    </div>
   <div id="mainContent">
     <div id="controlPanel">
       <h3>Imagenes de Control</h3>
       <div id="instructions"></div>
-      <!-- Thumbnails will be injected here by JS -->
+      <!-- Thumbnails will be inserted here by JS -->
     </div>
     <div id="comparisonPanel">
       <div id="imageContainer">
@@ -297,7 +307,7 @@
       <div id="controlsContainer"> 
         <button id="customBtn"></button><br>
         <input type="file" id="fileInput" accept="image/*" style="display:none"> 
-        <span id="fileLabel"></span>
+         <span id="fileLabel"></span> 
         <div id="exifData"></div>
         <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
       </div>
@@ -321,7 +331,7 @@
         Email to send data to: <input type="email" name="email" placeholder="CollectionCenter@email.com">
       </label><br>
       <label>
-        Sending Employee/volunter # : <input type="text" name="user" placeholder="See main list">
+        Sending Employee/volunter # : <input type="text" name="username" placeholder="See main list">
       </label><br>
       <button type="submit">Save</button>
       <button type="button" onclick="closeConfig()">Cancel</button>
@@ -329,7 +339,13 @@
   </div>
   
 <script>
-  
+
+
+//get system date and time into header
+const dt = new Date();
+document.getElementById("dateToday").innerHTML = dt;
+
+
 // Up to 5 control images, can add more
 
 // Store config variables
@@ -342,6 +358,7 @@ let controlImages = [
 ];
 let exifEnabled = true;
 let emailName = "";
+let usernameValue = "";
 
 // Load config from localStorage if available
 function loadConfig() {
@@ -351,8 +368,14 @@ function loadConfig() {
     if (Array.isArray(cfg.controlImages)) controlImages = cfg.controlImages;
     if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
     if (typeof cfg.emailName === "string") emailName = cfg.emailName;
-  }
-}
+   /* if (typeof cfg.username === "string") username = cfg.username;*/
+    if (typeof cfg.username === "string") {
+      usernameValue = cfg.username;
+    } else {
+      usernameValue = "";
+    }
+  }};
+
 loadConfig();
 
 // close config form
@@ -365,7 +388,7 @@ function closeConfig() {
 // Save config to localStorage
 function saveConfig() {
   localStorage.setItem('biolumConfig', JSON.stringify({
-    controlImages, exifEnabled, emailName
+    controlImages, exifEnabled, emailName, username: usernameValue
   }));
 }
 window.addEventListener('DOMContentLoaded', () => {
@@ -384,11 +407,19 @@ const fileLabel = document.getElementById('fileLabel');
 const latestImage = document.getElementById('latestImage');
 const exifData = document.getElementById('exifData');
 const currentExif = 'none';
+/*const username = document.getElementById('username');*/
+
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(currentLang);
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
+
+/*document.getElementById('numuserLabel').textContent = langData[currentLang].numuser;
+document.getElementById('usernameValue').textContent = (typeof usernameValue !== "undefined" && usernameValue) ? usernameValue : "";
+*/
+
+
 });
 
 
@@ -553,6 +584,7 @@ const langData = {
     langBtn: "EN",
     title: "Imagenes de Control",
     headercont: "INSTRUCCIONES",
+    numuser: "USUARIO:",
     instructions: `📷 Instrucciones:<br/>
       1. Lleve la pantalla de su celular al máximo de brillo<br/>
       2. Oprima "Abrir Cámara"<br/>
@@ -583,6 +615,7 @@ const langData = {
     langBtn: "ES",
     title: "Control Images",
      headercont: "INSTRUCTIONS",
+     numuser: "USER:",
     instructions: `📷 Instructions:<br/>
       1. Set your smartphone to max screen brilliance<br/>
       2. Press "Open Camera"<br/>
@@ -613,6 +646,7 @@ const langData = {
 let currentLang = 'es';
 let instrToggle = 'no';
 
+
 // add flags  to lNG BUTTONS
 
 function setLang(lang) {
@@ -632,16 +666,15 @@ function setLang(lang) {
   document.getElementById('instructions').innerHTML = "";
 }
 
-  document.querySelector('#showInstr').textContent = langData[lang].headercont;
+
+
   document.querySelector('#controlPanel h3').textContent = langData[lang].title;
-  
+  document.querySelector('#showInstr').textContent = langData[lang].headercont;
+ /* document.getElementById('numuser').textContent = langData[lang].numuser; */
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
   document.getElementById('customBtn2').textContent = langData[lang].sendSample;
   document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
-
-
-
 
 
  reloadControlThumbnails(); // <-- Rebuild thumbnails with correct labels
@@ -651,7 +684,10 @@ function setLang(lang) {
       lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
     );
   }
-}
+  document.getElementById('numuserLabel').textContent = langData[lang].numuser;
+  document.getElementById('usernameValue').textContent = (typeof usernameValue !== "undefined" && usernameValue) ? usernameValue : "";
+
+  }
 
 
 //FLAG END
@@ -692,6 +728,7 @@ document.getElementById('langToggle').onclick = function() {
 
 // Initial language setup
 window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
+
 
 // Update EXIF display to use language
 
@@ -763,11 +800,14 @@ document.getElementById('configForm').onsubmit = function(e) {
   }
   exifEnabled = this.exifOn.checked;
   emailName = this.email.value;
+  usernameValue = this.username.value;
   saveConfig();
   closeConfig();
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
+  setLang(currentLang); // Update username display
 };
+
 
 
 function reloadControlThumbnails() {
