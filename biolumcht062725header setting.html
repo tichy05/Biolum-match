@@ -318,7 +318,7 @@
       max-height: 45px;
       border: 0px solid rgb(37, 150, 190);
       color: #222;
-      padding:1px 0px 0px 45px;
+      padding:0px 0px 0px 45px;
       border-radius: 0px; 
       font-size: 12pt;
       padding-right: 2em;
@@ -347,6 +347,10 @@
         <button id="customBtn"></button><br>
         <input type="file" id="fileInput" accept="image/*" style="display:none"> 
          <span id="fileLabel"></span> 
+         <span id="msg1"></span>
+         <span id="msg2"></span>
+         <span id="msg3"></span>
+         <span id="msg4"></span>
         <div id="exifData"></div>
         <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
       </div>
@@ -1000,20 +1004,42 @@ checkbox.addEventListener('change', function() {
 //then uncheck control and remove sample or restart
 
 
-function getCheckedControlIndex() {
+ function getCheckedControlIndex() {
   const checkboxes = document.getElementsByName('controlCheckbox');
+  let msg1 = "x"; // Default if none checked
   for (let i = 0; i < checkboxes.length; i++) {
     if (checkboxes[i].checked) {
-      return parseInt(checkboxes[i].value, 10); // returns the index of the checked control   
+      msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1); // +1 for human-friendly index
+      break; // Stop after finding the first checked
     }
   }
-  return null; // none checked
+  //GPS Location of photo
+  const photoLocation = document.getElementById("photoLocation");
+
+ function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(successLocation,errorLocation);
+  } else {
+    photoLocation.innerHTML = "Geolocation is not supported by this browser.";
+  }
 }
 
- 
-   
+function successLocation(position) {
+  photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
 
+function errorLocation() {
+ photoLocation.innerHTML = ("N/A");
+}
 
+//All data
+  document.getElementById("msg1").innerHTML = "Control: " + msg1;
+  document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDt;
+  document.getElementById("msg3").innerHTML = "User: " + usernameValue;
+  document.getElementById("msg4").innerHTML = "GPS Coord.: " + photoLocation;
+
+ }
 </script>
 
 </body>
