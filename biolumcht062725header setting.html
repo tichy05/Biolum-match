@@ -136,6 +136,7 @@
     }
     #customBtn2 { margin-top: 25px; }
     #customBtn:hover, #customBtn2:hover { border-color: #888; }
+    #customBtn2::after{ border-color: #888; }
     #instructions {
       font-size: 14pt;
       margin: 20px 10px;
@@ -351,6 +352,7 @@
          <span id="msg2"></span>
          <span id="msg3"></span>
          <span id="msg4"></span>
+         <span id="msg5"></span>
         <div id="exifData"></div>
         <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
       </div>
@@ -1004,6 +1006,30 @@ checkbox.addEventListener('change', function() {
 //then uncheck control and remove sample or restart
 
 
+
+  //GPS Location of photo
+  const photoLocation = document.getElementById("msg4");
+
+  function getLocation() {
+    
+  const photoLocation = document.getElementById("msg4");
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+  } else {
+    photoLocation.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function success(position) {
+  photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
+
+function error() {
+ photoLocation.innerHTML = "N/A";
+}
+
  function getCheckedControlIndex() {
   const checkboxes = document.getElementsByName('controlCheckbox');
   let msg1 = "x"; // Default if none checked
@@ -1013,33 +1039,25 @@ checkbox.addEventListener('change', function() {
       break; // Stop after finding the first checked
     }
   }
-  //GPS Location of photo
-  const photoLocation = document.getElementById("photoLocation");
+//Call getLocation to upd GPS info
 
- function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(successLocation,errorLocation);
-  } else {
-    photoLocation.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
-
-function successLocation(position) {
-  photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
-  "<br>Longitude: " + position.coords.longitude;
-}
-
-function errorLocation() {
- photoLocation.innerHTML = ("N/A");
-}
-
+ getLocation();
+ 
 //All data
   document.getElementById("msg1").innerHTML = "Control: " + msg1;
   document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDt;
   document.getElementById("msg3").innerHTML = "User: " + usernameValue;
-  document.getElementById("msg4").innerHTML = "GPS Coord.: " + photoLocation;
+  document.getElementById("msg4").innerHTML = photoLocation.innerHTML;
 
- }
+//send --  check for errors
+
+  document.getElementById("msg5").innerHTML = "Enviando / Sending..."
+
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT"
+    }, 10000);
+  
+ 
+}
 </script>
 
 </body>
