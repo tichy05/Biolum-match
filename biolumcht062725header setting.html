@@ -136,7 +136,7 @@
     }
     #customBtn2 { margin-top: 25px; }
     #customBtn:hover, #customBtn2:hover { border-color: #888; }
-    #customBtn2::after{ border-color: #888; }
+    #customBtn2:hover, after{ border-color: #888; }
     #instructions {
       font-size: 14pt;
       margin: 20px 10px;
@@ -656,7 +656,7 @@ window.addEventListener('load', checkOrientation);
 window.addEventListener('orientationchange', () => {
   setTimeout(checkOrientation, 300);
 });
-// end Orientation check
+
 
 
 
@@ -1049,15 +1049,68 @@ function error() {
   document.getElementById("msg3").innerHTML = "User: " + usernameValue;
   document.getElementById("msg4").innerHTML = photoLocation.innerHTML;
 
-//send --  check for errors
+  // change 14
+  //befor 14
+/* formData.append('image', latestImage.src);*/
+//after 14
+const formData = new FormData();
+// Convert Data URL to Blob and append with filename
+function dataURLtoBlob(dataurl) {
+  const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+  return new Blob([u8arr], { type: mime });
+}
 
+const blob = dataURLtoBlob(latestImage.src);
+formData.append('image', blob, currentFileName || 'showdt + photoLocation.innerHTM.jpg');
+formData.append('control', msg1);
+formData.append('datetime', showDt);
+formData.append('user', usernameValue);
+formData.append('location', photoLocation.innerHTML);
+
+//Activate thru end-activate when we have a server to send to
+/*
+fetch('https://your-server.com/upload', {
+  method: 'POST',
+  body: formData
+})
+.then(res => res.ok ? res.json() : Promise.reject(res))
+.then(data => {
+  document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
+})
+.catch(err => {
+  document.getElementById("msg5").innerHTML = "Error sending data";
+}); */
+//end-activate
+
+//end change 14
+
+//test code before 14
+//send -- dataToSend : full info
+ /*dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
   document.getElementById("msg5").innerHTML = "Enviando / Sending..."
 
-  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT"
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
     }, 10000);
-  
- 
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "RESET"
+    }, 15000);
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "CLEAR"
+  resetScreen();
+    }, 20000);*/
+    //test code before 14
 }
+function resetScreen() {
+
+  document.getElementById("msg1").innerHTML = "";
+  document.getElementById("msg2").innerHTML = "";
+  document.getElementById("msg3").innerHTML = "";
+  document.getElementById("msg4").innerHTML = "";
+  document.getElementById("msg5").innerHTML = "";
+  latestImage.src = "";
+  fileLabel.textContent = "";
+}
+
 </script>
 
 </body>
