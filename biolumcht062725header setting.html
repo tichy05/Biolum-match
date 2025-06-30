@@ -352,7 +352,7 @@
          <span id="msg2"></span>
          <span id="msg3"></span>
          <span id="msg4"></span>
-         <span id="msg5"></span>
+         <span id="msg5" style="color: yellow"></span>
         <div id="exifData"></div>
         <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
       </div>
@@ -794,7 +794,6 @@ function setLang(lang) {
   document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
 
-
  reloadControlThumbnails(); // <-- Rebuild thumbnails with correct labels
 
   if (lastExif) {
@@ -1091,13 +1090,12 @@ fetch('https://your-server.com/upload', {
  dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
   document.getElementById("msg5").innerHTML = "Enviando / Sending...";
 
-  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT"
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
     }, 10000);
-  setTimeout(() => {document.getElementById("msg5").innerHTML = "RESET"
-    }, 15000);
-  setTimeout(() => {document.getElementById("msg5").innerHTML = "CLEAR"
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "LIMPIANDO / RESET";
   resetScreen()
-    }, 20000);
+    }, 15000);
+  
     //test code before 14
 }
 function resetScreen() {
@@ -1107,7 +1105,7 @@ function resetScreen() {
   document.getElementById("msg3").innerHTML = "";
   document.getElementById("msg4").innerHTML = "";
   document.getElementById("msg5").innerHTML = "";
-  latestImage.src = "URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg)";
+  latestImage.src = "";
   fileLabel.textContent = "";
 
     // Uncheck all control checkboxes
@@ -1120,4 +1118,4 @@ function resetScreen() {
 </script>
 
 </body>
-</html>
+</html>r
