@@ -87,12 +87,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 220px;
-      min-height: 300px;
+      min-width: 230px;
+      min-height: 280px;
       background-repeat: no-repeat;
       background-position: center;
       background-color: transparent;
-      background-size: 220px 300px;
+      background-size: 230px 280px;
       background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
     }
     #controlsContainer {
@@ -1030,7 +1030,7 @@ function error() {
  photoLocation.innerHTML = "N/A";
 }
 
- function getCheckedControlIndex() {
+function getCheckedControlIndex() {
   const checkboxes = document.getElementsByName('controlCheckbox');
   let msg1 = "x"; // Default if none checked
   for (let i = 0; i < checkboxes.length; i++) {
@@ -1063,7 +1063,7 @@ function dataURLtoBlob(dataurl) {
 }
 
 const blob = dataURLtoBlob(latestImage.src);
-formData.append('image', blob, currentFileName || 'showdt + photoLocation.innerHTM.jpg');
+formData.append('image', blob, currentFileName || 'showdt + photoLocation.innerHTML.jpg');
 formData.append('control', msg1);
 formData.append('datetime', showDt);
 formData.append('user', usernameValue);
@@ -1087,17 +1087,17 @@ fetch('https://your-server.com/upload', {
 //end change 14
 
 //test code before 14
-//send -- dataToSend : full info
- /*dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
-  document.getElementById("msg5").innerHTML = "Enviando / Sending..."
+//send -- dataToSend : full info for testing
+ dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
+  document.getElementById("msg5").innerHTML = "Enviando / Sending...";
 
-  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
+  setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT"
     }, 10000);
   setTimeout(() => {document.getElementById("msg5").innerHTML = "RESET"
     }, 15000);
   setTimeout(() => {document.getElementById("msg5").innerHTML = "CLEAR"
-  resetScreen();
-    }, 20000);*/
+  resetScreen()
+    }, 20000);
     //test code before 14
 }
 function resetScreen() {
@@ -1109,6 +1109,12 @@ function resetScreen() {
   document.getElementById("msg5").innerHTML = "";
   latestImage.src = "";
   fileLabel.textContent = "";
+
+    // Uncheck all control checkboxes
+  const checkboxes = document.getElementsByName('controlCheckbox');
+  for (let i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].checked = false;
+  }
 }
 
 </script>
