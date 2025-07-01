@@ -80,6 +80,7 @@
       box-sizing: border-box;
     }
     #imageContainer {
+      position: relative;
       flex: 1 1 0;
       margin-top:5px;
       margin-left: 35px;
@@ -94,6 +95,14 @@
       background-size: 210px 210px;
       background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
     }
+
+   #latestImage[src=""] {
+  display: none;
+  }
+  #latestImage:not([src=""]) {
+  display: block;
+  }
+
     #controlsContainer {
       flex: 1 1 0;
       display: flex;
@@ -122,7 +131,7 @@
       border: 2px solid rgb(37, 150, 190);
       background: #111;
     }
-    #customBtn, #customBtn2 {
+    #customBtn, #customBtn2,#customBtn3 {
       max-width: 200px;
       font-size: 14pt;
       max-height: 50px;
@@ -133,9 +142,9 @@
       background-color: #222;
       margin-top: 2px;
     }
-    #customBtn2 { margin-top: 25px; }
-    #customBtn:hover, #customBtn2:hover { border-color: #888; }
-    #customBtn2:hover, after{ border-color: #888; }
+    #customBtn2, #customBtn3 { margin-top: 25px; }
+    #customBtn:hover, #customBtn2:hover, #customBtn3:hover { border-color: #888; }
+    #customBtn2:hover, #customBtn3:hover, after{ border-color: #888; }
     #instructions {
       font-size: 14pt;
       margin: 20px 10px;
@@ -341,12 +350,12 @@
     </div>
     <div id="comparisonPanel">
       <div id="imageContainer">
-        <img id="latestImage" src="" alt="" style="background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg)";>
+        <img id="latestImage" src="" alt="">
       </div>
       <div id="controlsContainer"> 
         <button id="customBtn"></button><br>
         <input type="file" id="fileInput" accept="image/*" style="display:none"> 
-         <span id="fileLabel"></span> 
+          <span id="fileLabel" style="display:none"></span>
          <span id="msg1"></span>
          <span id="msg2"></span>
          <span id="msg3"></span>
@@ -354,6 +363,7 @@
          <span id="msg5" style="color: yellow "></span>
         <div id="exifData"></div>
         <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
+        <button id="customBtn3" type="button" onclick="resetScreen()">Reset</button>
       </div>
     </div>
   </div>
@@ -392,7 +402,7 @@ let Th = (dt.getHours())
 if (dt.getHours() < 10) {
   (Th = "0"+Th)
   showDt = (showDt+"  "+ Th)  
-} else {
+} else { 
     showDt = (showDt+"  "+ Th)
   }
 
@@ -464,9 +474,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 const controlPanel = document.getElementById('controlPanel');
 const comparisonPanel = document.getElementById('comparisonPanel');
-const fileInput = document.getElementById('fileInput');
-const customBtn = document.getElementById('customBtn');
+window.fileInput = document.getElementById('fileInput');
 const customBtn2 = document.getElementById('customBtn2');
+const customBtn3 = document.getElementById('customBtn3');
 const fileLabel = document.getElementById('fileLabel');
 const latestImage = document.getElementById('latestImage');
 const exifData = document.getElementById('exifData');
@@ -490,16 +500,38 @@ document.getElementById('usernameValue').textContent = (typeof usernameValue !==
 
 // Select input file, photo or take photo depending on device
 
-customBtn.onclick = () => fileInput.click();
+customBtn.onclick = () => window.fileInput.click();
 
-//replaced from here 6-27 10:58
-/*fileInput.addEventListener('change', (event) => {
+/*window.fileInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
-  if (file) {
-    fileLabel.textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      latestImage.src = e.target.result;
+
+
+if (file) {
+  latestImage.style.display = "block";
+  currentFileName = file.name;
+  fileLabel.textContent = currentFileName;
+
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new window.Image();
+    img.onload = function() {
+      let portraitDataUrl = e.target.result;
+      if (img.width > img.height) {
+        // Landscape, rotate to portrait
+        const canvas = document.createElement('canvas');
+        canvas.width = img.height;
+        canvas.height = img.width;
+        const ctx = canvas.getContext('2d');
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.restore();
+        portraitDataUrl = canvas.toDataURL('image/jpeg');
+      }
+      latestImage.src = portraitDataUrl;
+      latestImage.style.display = "block";
       exifData.textContent = "Leyendo datos EXIF...";
       EXIF.getData(file, function() {
         const iso = EXIF.getTag(this, 'ISOSpeedRatings');
@@ -507,77 +539,27 @@ customBtn.onclick = () => fileInput.click();
         const fNumber = EXIF.getTag(this, 'FNumber');
         const wb = EXIF.getTag(this, 'WhiteBalance');
         const focus = EXIF.getTag(this, 'FocalLength');
-
-        exifData.innerHTML = `
-          📷 ISO: ${iso || 'N/A'}<br/>
-          🕒 Tiempo de exposición: 1/${exposure || ''} ms<br/>
-         f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
-          ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
-          🔍 Longitud focal: ${focus || 'N/A'}
-        `;
+        lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
+        exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
       });
-
-      fileInput.value = "";
+      window.fileInput.value = "";
     };
-    reader.readAsDataURL(file);
-  } else {
-    fileLabel.textContent = "Ningún archivo elegido";
-  }
-}); */
-//thru there 6-27 10:58
-//new section to rotate to portrait if input is landscape
-fileInput.addEventListener('change', (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    currentFileName = file.name;
-    fileLabel.textContent = currentFileName;
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+} else {
+  fileLabel.textContent = langData[currentLang].noFile;
+  currentFileName = "";
+  lastExif = null;
+  exifData.innerHTML = "";
+}
+});*/
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new window.Image();
-      img.onload = function() {
-        let portraitDataUrl = e.target.result;
-        if (img.width > img.height) {
-          // Landscape, rotate to portrait
-          const canvas = document.createElement('canvas');
-          canvas.width = img.height;
-          canvas.height = img.width;
-          const ctx = canvas.getContext('2d');
-          ctx.save();
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(-Math.PI / 2);
-          ctx.drawImage(img, -img.width / 2, -img.height / 2);
-          ctx.restore();
-          portraitDataUrl = canvas.toDataURL('image/jpeg');
-        }
-        latestImage.src = portraitDataUrl;
-        exifData.textContent = "Leyendo datos EXIF...";
-        EXIF.getData(file, function() {
-          const iso = EXIF.getTag(this, 'ISOSpeedRatings');
-          const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
-          const fNumber = EXIF.getTag(this, 'FNumber');
-          const wb = EXIF.getTag(this, 'WhiteBalance');
-          const focus = EXIF.getTag(this, 'FocalLength');
-          lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
-          exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
-        });
-        fileInput.value = "";
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  } else {
-    fileLabel.textContent = langData[currentLang].noFile;
-    currentFileName = "";
-    lastExif = null;
-    exifData.innerHTML = "";
-  }
-});
 
 //thru here rotate to portrait 6-27 10:58
 // Load control thumbnails
 
-controlImages.forEach((src, idx) => {
+/* controlImages.forEach((src, idx) => {
   const container = document.createElement('div');
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
@@ -618,7 +600,7 @@ controlImages.forEach((src, idx) => {
   container.appendChild(img);
   container.appendChild(label);
   controlPanel.appendChild(container);
-});
+}); */
 function checkOrientation() {
   const warning = document.getElementById('rotateWarning');
   const configModal = document.getElementById('configModal');
@@ -700,7 +682,7 @@ const langData = {
     title: "Imagenes de Control",
     headercont: "INSTRUCCIONES",
     numuser: "USUARIO:",
-    appname: "BIOLUMINISCENCIA PERCIBIDA",
+    appname: "BIOLUM - Bioluminiscencia Percibida",
     instructions: `📷 Instrucciones:<br/>
       1. Lleve la pantalla de su celular al máximo de brillo<br/>
       2. Oprima "Abrir Cámara"<br/>
@@ -732,7 +714,7 @@ const langData = {
     title: "Control Images",
      headercont: "INSTRUCTIONS",
      numuser: "USER:",
-     appname: "PERCEIVED BIOLUMINISCENSE",
+     appname: "BIOLUM - Perceived Bioluminiscense",
     instructions: `📷 Instructions:<br/>
       1. Set your smartphone to max screen brilliance<br/>
       2. Press "Open Camera"<br/>
@@ -790,7 +772,7 @@ function setLang(lang) {
   document.getElementById('appname').textContent = langData[lang].appname;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
   document.getElementById('customBtn2').textContent = langData[lang].sendSample;
-  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
+  document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile; 
   document.getElementById('rotateWarning').textContent = langData[lang].rotate;
 
  reloadControlThumbnails(); // <-- Rebuild thumbnails with correct labels
@@ -852,9 +834,15 @@ window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
 let lastExif = null; // Store last EXIF data
 let currentFileName = ""; // Store current file name
 
-fileInput.addEventListener('change', (event) => {
+
+window.fileInput.addEventListener('change', handleFileInputChange);
+
+
+/*window.fileInput.addEventListener('change', (event) => {
+  console.log("window.fileInput changed");
   const file = event.target.files[0];
   if (file) {
+    latestImage.style.display = "block";
     currentFileName = file.name;
     fileLabel.textContent = currentFileName;
  
@@ -872,7 +860,7 @@ fileInput.addEventListener('change', (event) => {
         exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
         
       });
-      fileInput.value = "";
+      window.fileInput.value = "";
     };
     reader.readAsDataURL(file);
    } else {
@@ -881,7 +869,7 @@ fileInput.addEventListener('change', (event) => {
     lastExif = null;
     exifData.innerHTML = "";
   }
-});
+}); */
 
 function showInstructions() {
   if (instrToggle === "yes") {
@@ -929,7 +917,7 @@ document.getElementById('configForm').onsubmit = function(e) {
 
 
 
-function reloadControlThumbnails() {
+/*function reloadControlThumbnails() {
   // Remove old thumbnails
   document.querySelectorAll('.thumb').forEach(el => el.parentNode.remove());
   // Add new thumbnails
@@ -997,18 +985,96 @@ checkbox.addEventListener('change', function() {
 
     controlPanel.appendChild(container);
   });
-}
+} */
 //this function needs work  email? save file? txt msg?
 //Send Sample button comes here, takes the identifier of the control image selected
 //and sends it along the sample photo
 //then uncheck control and remove sample or restart
 
 
+function reloadControlThumbnails() {
+  // Remove all children except the h3 and instructions
+  const keep = new Set(['H3', 'instructions']);
+  // Use a while loop for safe removal
+  let i = 0;
+  while (i < controlPanel.children.length) {
+    const child = controlPanel.children[i];
+    if (!keep.has(child.tagName) && child.id !== 'instructions') {
+      controlPanel.removeChild(child);
+    } else {
+      i++;
+    }
+  }
+
+  controlImages.forEach((src, idx) => {
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.marginBottom = '15px';
+    container.style.fontSize = '14pt';
+
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'controlCheckbox';
+    checkbox.className = 'single-selection-checkbox';
+    checkbox.value = idx;
+    checkbox.style.marginRight = '8px';
+
+    // Label
+    const label = document.createElement('span');
+    label.textContent = `IB # ${idx + 1}`;
+    label.style.marginRight = '8px';
+
+    // Image
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'thumb';
+    img.onclick = () => {
+      const originalSrc = latestImage.src;
+      latestImage.src = src;
+
+      let tempLabel = document.createElement('span');
+      tempLabel.textContent = `IB # ${idx + 1}`;
+      tempLabel.style.display = 'block';
+      tempLabel.style.marginTop = '10px';
+      tempLabel.style.fontSize = '18pt';
+      tempLabel.id = 'tempLabel';
+
+      const oldLabel = document.getElementById('tempLabel');
+      if (oldLabel) oldLabel.remove();
+
+      controlsContainer.appendChild(tempLabel);
+
+      setTimeout(() => {
+        latestImage.src = originalSrc;
+        tempLabel.remove();
+      }, 1000);
+    };
+
+    container.appendChild(img);
+    container.appendChild(label);
+    container.appendChild(checkbox);
+
+    checkbox.addEventListener('change', function() {
+      if (this.checked) {
+        document.querySelectorAll('input[name="controlCheckbox"]').forEach(cb => {
+          if (cb !== this) cb.checked = false;
+        });
+      }
+    });
+
+    controlPanel.appendChild(container);
+  });
+}
 
   //GPS Location of photo
   const photoLocation = document.getElementById("msg4");
 
-  function getLocation() {
+//change 16 old starts
+
+ /* function getLocation() {
     
   const photoLocation = document.getElementById("msg4");
 
@@ -1022,13 +1088,44 @@ checkbox.addEventListener('change', function() {
 function success(position) {
   photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
   "<br>Longitude: " + position.coords.longitude;
+} */
+
+//change 16 old ends
+//change 16 new starts
+function getLocation(callback) {
+  const photoLocation = document.getElementById("msg4");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
+          "<br>Longitude: " + position.coords.longitude;
+        if (callback) callback();
+      },
+      function() {
+        photoLocation.innerHTML = "N/A";
+        if (callback) callback();
+      }
+    );
+  } else {
+    photoLocation.innerHTML = "Geolocation is not supported by this browser.";
+    if (callback) callback();
+  }
 }
+
+//change 16 new ends
 
 function error() {
  photoLocation.innerHTML = "N/A";
 }
-
-function getCheckedControlIndex() {
+//change 16 p2 old start
+/* function getCheckedControlIndex() {
+ // Check if an image is loaded
+  if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
+    document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
+    return; // Stop further execution
+  } 
+  
   const checkboxes = document.getElementsByName('controlCheckbox');
   let msg1 = "x"; // Default if none checked
   for (let i = 0; i < checkboxes.length; i++) {
@@ -1039,33 +1136,124 @@ function getCheckedControlIndex() {
   }
 //Call getLocation to upd GPS info
 
- getLocation();
- 
-//All data
+ getLocation(); */
+//change 17 p2 old end
+
+//change 17 p2 new starts
+function getCheckedControlIndex() {
+  console.log("getCheckedControlIndex called");
+  // Check if an image is loaded
+   console.log("latestImage.src:", latestImage.src);
+  if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
+    document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
+    return; // Stop further execution
+  } 
+  
+  const checkboxes = document.getElementsByName('controlCheckbox');
+  let msg1 = "x"; // Default if none checked
+  for (let i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
+      msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1); // +1 for human-friendly index
+      break; // Stop after finding the first checked
+    }
+  }
+console.log("msg1:", msg1);
+  // Now get location and send after it's updated
+
+  getLocation(() => {
+    console.log("getLocation callback");
+    sendSample(msg1, null, usernameValue);
+  });
+}
+//change 17 p2 new ends
+
+function sendSample(msg1, showDt, usernameValue) {
+  
+  console.log("sendSample called with msg1:", msg1, "showDt:", showDt, "usernameValue:", usernameValue);
+  
+  // Always get the current date/time when sending
+  const dt = new Date();
+  let showDtNow = (dt.getDate()+"/"+(dt.getMonth()+1)+"/"+dt.getFullYear());
+  let Th = dt.getHours();
+  if (Th < 10) Th = "0" + Th;
+  showDtNow = showDtNow + "  " + Th;
+  let Tm = dt.getMinutes();
+  if (Tm < 10) Tm = "0" + Tm;
+  showDtNow = showDtNow + ":" + Tm;
+
+  const photoLocation = document.getElementById("msg4");
   document.getElementById("msg1").innerHTML = "Control: " + msg1;
-  document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDt;
+  document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDtNow;
   document.getElementById("msg3").innerHTML = "User: " + usernameValue;
   document.getElementById("msg4").innerHTML = photoLocation.innerHTML;
 
-  // change 14
-  //befor 14
-/* formData.append('image', latestImage.src);*/
-//after 14
-const formData = new FormData();
+  // Build FormData and Blob here, every time
+  const formData = new FormData();
+
+  // Defensive: Only append image if valid
+  const blob = dataURLtoBlob(latestImage.src);
+  if (blob) {
+    formData.append('image', blob, currentFileName || (showDtNow + "_" + photoLocation.innerHTML + ".jpg"));
+  }
+  formData.append('control', msg1);
+  formData.append('datetime', showDtNow);
+  formData.append('user', usernameValue);
+  formData.append('location', photoLocation.innerHTML);
+
+  // For testing: show data
+  dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDtNow + "User: " + usernameValue + photoLocation.innerHTML;
+  // ...inside sendSample()...
+  document.getElementById("msg5").innerHTML = "Enviando / Sending...";
+
+  setTimeout(() => {
+    document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
+    setTimeout(() => {
+      document.getElementById("msg5").innerHTML = "LIMPIANDO / RESET";
+      setTimeout(() => {
+        resetScreen();
+      }, 1500); // Wait 1.5s before reset
+    }, 2000); // Show "ENVIADO / SENT" for 2s
+  }, 5000); // Initial wait for "Enviando / Sending..."
+// ...existing code...
+
+  // Uncomment and use this when you have a server:
+  /*
+  fetch('https://your-server.com/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.ok ? res.json() : Promise.reject(res))
+  .then(data => {
+    document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
+  })
+  .catch(err => {
+    document.getElementById("msg5").innerHTML = "Error sending data";
+  });
+  */
+}
+
 // Convert Data URL to Blob and append with filename
 function dataURLtoBlob(dataurl) {
-  const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  if (!dataurl || typeof dataurl !== "string" || !dataurl.startsWith("data:")) {
+    return null;
+  }
+  const arr = dataurl.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  if (!mimeMatch) return null;
+  const mime = mimeMatch[1];
+  const bstr = atob(arr[1]);
+  const n = bstr.length;
+  const u8arr = new Uint8Array(n);
   for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
   return new Blob([u8arr], { type: mime });
 }
 
-const blob = dataURLtoBlob(latestImage.src);
-formData.append('image', blob, currentFileName || 'showdt + photoLocation.innerHTML.jpg');
+/*formData.append('image', blob, currentFileName || 'showdt + photoLocation.innerHTML.jpg');
 formData.append('control', msg1);
 formData.append('datetime', showDt);
 formData.append('user', usernameValue);
-formData.append('location', photoLocation.innerHTML);
+formData.append('location', photoLocation.innerHTML);*/
 
 //Activate thru end-activate when we have a server to send to
 /*
@@ -1086,33 +1274,149 @@ fetch('https://your-server.com/upload', {
 
 //test code before 14
 //send -- dataToSend : full info for testing
- dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
+/* dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDt + "User: " + usernameValue + photoLocation.innerHTML;
   document.getElementById("msg5").innerHTML = "Enviando / Sending...";
 
   setTimeout(() => {document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
     }, 10000);
   setTimeout(() => {document.getElementById("msg5").innerHTML = "LIMPIANDO / RESET";
   resetScreen()
-    }, 15000);
+    }, 15000); */
   
     //test code before 14
-}
-function resetScreen() {
 
+function resetScreen() {
+  console.log("resetScreen called");
   document.getElementById("msg1").innerHTML = "";
   document.getElementById("msg2").innerHTML = "";
   document.getElementById("msg3").innerHTML = "";
   document.getElementById("msg4").innerHTML = "";
   document.getElementById("msg5").innerHTML = "";
   latestImage.src = "";
+  latestImage.style.display = "none";
   fileLabel.textContent = "";
 
-    // Uncheck all control checkboxes
+  // Uncheck all control checkboxes
   const checkboxes = document.getElementsByName('controlCheckbox');
   for (let i = 0; i < checkboxes.length; i++) {
     checkboxes[i].checked = false;
   }
+
+  // Replace file input to ensure change event always fires
+  const oldInput = document.getElementById('fileInput');
+  const newInput = oldInput.cloneNode(true);
+  oldInput.parentNode.replaceChild(newInput, oldInput);
+
+  // Update global reference
+  window.fileInput = newInput;
+
+  // Re-attach the main event listener
+  newInput.addEventListener('change', handleFileInputChange);
+
+  // *** FIX: Re-attach the button handler to the new input ***
+  customBtn.onclick = () => window.fileInput.click();
+
+  // Re-attach the event listener
+ /* newInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      latestImage.style.display = "block";
+      currentFileName = file.name;
+      fileLabel.textContent = currentFileName;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        latestImage.src = e.target.result;
+        exifData.textContent = "Leyendo datos EXIF...";
+        EXIF.getData(file, function() {
+          const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+          const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+          const fNumber = EXIF.getTag(this, 'FNumber');
+          const wb = EXIF.getTag(this, 'WhiteBalance');
+          const focus = EXIF.getTag(this, 'FocalLength');
+          lastExif = { iso, exposure, fNumber, wb, focus };
+          exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+        });
+        newInput.value = "";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      fileLabel.textContent = langData[currentLang].noFile;
+      currentFileName = "";
+      lastExif = null;
+      exifData.innerHTML = "";
+    }
+  }); */
+
+
+
+// Update global reference if you use it elsewhere
+  window.fileInput = newInput;
+
+  // Re-attach the button click handler to use the new input
+ // Re-attach the main event listener
+  newInput.addEventListener('change', handleFileInputChange);
+/*customBtn.onclick = () => {
+    console.log("customBtn clicked, fileInput id:", window.fileInput.id);
+    window.fileInput.click();
+  };
+}*/
 }
+
+
+function handleFileInputChange(event) {
+  console.log("window.fileInput changed");
+  const file = event.target.files[0];
+  if (file) {
+    latestImage.style.display = "block";
+    currentFileName = file.name;
+    fileLabel.textContent = currentFileName;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = function() {
+        let portraitDataUrl = e.target.result;
+        if (img.width > img.height) {
+          // Landscape, rotate to portrait
+          const canvas = document.createElement('canvas');
+          canvas.width = img.height;
+          canvas.height = img.width;
+          const ctx = canvas.getContext('2d');
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.drawImage(img, -img.width / 2, -img.height / 2);
+          ctx.restore();
+          portraitDataUrl = canvas.toDataURL('image/jpeg');
+        }
+        latestImage.src = portraitDataUrl;
+        latestImage.style.display = "block";
+        exifData.textContent = "Leyendo datos EXIF...";
+        EXIF.getData(file, function() {
+          const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+          const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+          const fNumber = EXIF.getTag(this, 'FNumber');
+          const wb = EXIF.getTag(this, 'WhiteBalance');
+          const focus = EXIF.getTag(this, 'FocalLength');
+          lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
+          exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+        });
+        window.fileInput.value = "";
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileLabel.textContent = langData[currentLang].noFile;
+    currentFileName = "";
+    lastExif = null;
+    exifData.innerHTML = "";
+  }
+}
+
+
+
 
 </script>
 
