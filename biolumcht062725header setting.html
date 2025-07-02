@@ -267,7 +267,7 @@
       
     }
 
-/*   new */
+
 @media (max-width: 600px) {
   #header {
     font-size: 1.2em;
@@ -276,8 +276,8 @@
     min-height: 48px;
     padding: 4px 0;
     flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content:center;
+    align-items: center;
   }
   .username,
   .showInstr {
@@ -294,7 +294,7 @@
   }
 }
 
-/*thru here */
+
 
 
     #rotateWarning {
@@ -344,7 +344,7 @@
     </div>
   <div id="mainContent">
     <div id="controlPanel">
-      <h3>Imagenes de Control</h3>
+      <H3>Imagenes de Control</H3>
       <div id="instructions"></div>
       <!-- Thumbnails will be inserted here by JS -->
     </div>
@@ -767,7 +767,7 @@ function setLang(lang) {
 
 
 
-  document.querySelector('#controlPanel h3').textContent = langData[lang].title;
+  document.querySelector('#controlPanel H3').textContent = langData[lang].title;
   document.querySelector('#showInstr').textContent = langData[lang].headercont;
   document.getElementById('appname').textContent = langData[lang].appname;
   document.getElementById('customBtn').textContent = langData[lang].chooseFile;
@@ -993,7 +993,7 @@ checkbox.addEventListener('change', function() {
 
 
 function reloadControlThumbnails() {
-  // Remove all children except the h3 and instructions
+  // Remove all children except the H3 and instructions
   const keep = new Set(['H3', 'instructions']);
   // Use a while loop for safe removal
   let i = 0;
