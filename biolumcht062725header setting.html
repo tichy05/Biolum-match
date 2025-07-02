@@ -31,7 +31,7 @@
       width: 100vw;
       min-height:36px;
       height: 4vh;
-      background-color: rgb(37, 150, 190); 
+      background-color: rgba(5,128,143,255); 
       color: #222;
       display: flex;
       align-items: center;
@@ -92,7 +92,7 @@
       min-height: 300px;
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 210px 210px;
+      background-size: 210px 300px;
       background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
     }
 
@@ -124,18 +124,18 @@
       cursor: pointer;
       transition: border 0.2s;
     }
-    .thumb:hover { border-color: rgb(37, 150, 190); }
+    .thumb:hover { border-color: rgba(5,128,143,255); }
     #latestImage {
       max-width: 100%;
       max-height: 65vh;
-      border: 2px solid rgb(37, 150, 190);
+      border: 2px solid rgba(5,128,143,255);
       background: #111;
     }
     #customBtn, #customBtn2,#customBtn3 {
       max-width: 200px;
       font-size: 14pt;
       max-height: 50px;
-      border: 2px solid rgb(37, 150, 190);
+      border: 2px solid rgba(5,128,143,255);
       color: #c2bfbf;;
       padding: 10px;
       border-radius: 24px;
@@ -210,7 +210,7 @@
       transition: background 0.2s;
     }
     #configForm button:hover {
-      background:rgb(37, 150, 190);
+      background:rgba(5,128,143,255);
     }
     #configModal {
       display: none;
@@ -325,7 +325,7 @@
       margin-left: 0px;
       max-width: 100px;
       max-height: 45px;
-      border: 0px solid rgb(37, 150, 190);
+      border: 0px solid rgba(5,128,143,255);
       color: #222;
       padding:0px 0px 0px 45px;
       border-radius: 0px; 
@@ -755,9 +755,9 @@ function setLang(lang) {
 
   // Set flag background
   if (lang === 'es') {
-    langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/7/71/Flag_of_the_United_States_%28Web_Colors%29.svg')";
+    langToggle.style.backgroundImage = "url('https://tichy05.github.io/Biolum-match/Flag_of_the_United_States.svg')";
   } else {
-    langToggle.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/2/28/Flag_of_Puerto_Rico.svg')";
+    langToggle.style.backgroundImage = "url('https://tichy05.github.io/Biolum-match/Flag_of_Puerto_Rico.svg')";
   }
    if (instrToggle === 'yes') {
   document.getElementById('instructions').innerHTML = langData[lang].instructions;
