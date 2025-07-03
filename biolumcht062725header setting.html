@@ -997,8 +997,8 @@ checkbox.addEventListener('change', function() {
 //and sends it along the sample photo
 //then uncheck control and remove sample or restart
 
-
-function reloadControlThumbnails() {
+//change 18 old starts
+/* function reloadControlThumbnails() {
   // Remove all children except the H3 and instructions
   const keep = new Set(['H3', 'instructions']);
   // Use a while loop for safe removal
@@ -1073,7 +1073,99 @@ function reloadControlThumbnails() {
 
     controlPanel.appendChild(container);
   });
+}  */
+//change 18 old ends
+//change 18 new starts
+
+function reloadControlThumbnails() {
+  // Remove all children except the H3 and instructions
+  const keep = new Set(['H3', 'instructions']);
+  let i = 0;
+  while (i < controlPanel.children.length) {
+    const child = controlPanel.children[i];
+    if (!keep.has(child.tagName) && child.id !== 'instructions') {
+      controlPanel.removeChild(child);
+    } else {
+      i++;
+    }
+  }
+
+  controlImages.forEach((src, idx) => {
+    if (!src) return; // Skip if no image URL
+
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.marginBottom = '15px';
+    container.style.fontSize = '14pt';
+
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'controlCheckbox';
+    checkbox.className = 'single-selection-checkbox';
+    checkbox.value = idx;
+    checkbox.style.marginRight = '8px';
+
+    // Label
+    const label = document.createElement('span');
+    label.textContent = `IB # ${idx + 1}`;
+    label.style.marginRight = '8px';
+
+    // Image
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'thumb';
+    img.alt = ""; // No alt text
+    img.onclick = () => {
+      const originalSrc = latestImage.src;
+      latestImage.src = src;
+
+      let tempLabel = document.createElement('span');
+      tempLabel.textContent = `IB # ${idx + 1}`;
+      tempLabel.style.display = 'block';
+      tempLabel.style.marginTop = '10px';
+      tempLabel.style.fontSize = '18pt';
+      tempLabel.id = 'tempLabel';
+
+      const oldLabel = document.getElementById('tempLabel');
+      if (oldLabel) oldLabel.remove();
+
+      controlsContainer.appendChild(tempLabel);
+
+      setTimeout(() => {
+        latestImage.src = originalSrc;
+        tempLabel.remove();
+      }, 1000);
+    };
+
+    // Hide label and checkbox if image fails to load
+    img.onerror = () => {
+      container.style.display = 'none';
+    };
+
+    container.appendChild(img);
+    container.appendChild(label);
+    container.appendChild(checkbox);
+
+    checkbox.addEventListener('change', function() {
+      if (this.checked) {
+        document.querySelectorAll('input[name="controlCheckbox"]').forEach(cb => {
+          if (cb !== this) cb.checked = false;
+        });
+      }
+    });
+
+    controlPanel.appendChild(container);
+  });
 }
+// ...existing code...
+
+
+
+
+//change 18 new ends
 
   //GPS Location of photo
   const photoLocation = document.getElementById("msg4");
