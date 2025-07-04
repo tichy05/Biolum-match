@@ -981,7 +981,7 @@ function getLocation(callback) {
         // Limit latitude and longitude to 8 decimal places
         const lat = position.coords.latitude.toFixed(8);
         const lng = position.coords.longitude.toFixed(8);
-        const loc = "Latitude:" + lat + ",Longitude:" + lng;
+        const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
         document.getElementById("msg4").innerHTML = loc;
         if (callback) callback(loc);
       },
@@ -1084,7 +1084,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
  console.log("Entering fetch");
- fetch('https://first-gym-hockey-minimum.trycloudflare.com/upload', {
+ fetch('http://127.0.0.1:3000/upload', {
   method: 'POST',
   body: formData
 })
