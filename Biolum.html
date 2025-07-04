@@ -1084,7 +1084,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
  console.log("Entering fetch");
- fetch('http://127.0.0.1:3000/upload', {
+ fetch('https://first-gym-hockey-minimum.trycloudflare.com/upload', {
   method: 'POST',
   body: formData
 })
