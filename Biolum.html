@@ -430,11 +430,11 @@ document.getElementById("dateToday").innerHTML = showDt;
 
 // Store config variables
 let controlImages = [
-  'https://tichy05.github.io/Biolum-match/NIVEL 1.jpg', 
-  'https://tichy05.github.io/Biolum-match/NIVEL 2.jpg', 
-  'https://tichy05.github.io/Biolum-match/NIVEL 3.jpg',
-  'https://tichy05.github.io/Biolum-match/NIVEL 4.jpg', 
-  'https://tichy05.github.io/Biolum-match/NIVEL 5.jpg' 
+  'https://tichy05.github.io/Biolum-match/IB 1.jpg', 
+  'https://tichy05.github.io/Biolum-match/IB 2.jpg', 
+  'https://tichy05.github.io/Biolum-match/IB 3.jpg',
+  'https://tichy05.github.io/Biolum-match/IB 4.jpg', 
+  'https://tichy05.github.io/Biolum-match/IB 5.jpg' 
 ];
 let exifEnabled = false;
 let emailName = "";
@@ -824,115 +824,6 @@ function reloadControlThumbnails() {
   //GPS Location of photo
   const photoLocation = document.getElementById("msg4");
 
-
-/*function getLocation(callback) {
-  const photoLocation = document.getElementById("msg4");
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        photoLocation.innerHTML = "Latitude: " + position.coords.latitude +
-          "<br>Longitude: " + position.coords.longitude;
-        if (callback) callback();
-      },
-      function() {
-        photoLocation.innerHTML = "N/A";
-        if (callback) callback();
-      }
-    );
-  } else {
-    photoLocation.innerHTML = "Geolocation is not supported by this browser.";
-    if (callback) callback();
-  }
-}
-
-
-
-function error() {
- photoLocation.innerHTML = "N/A";
-}
-
-function getCheckedControlIndex() {
-  console.log("getCheckedControlIndex called");
-  // Check if an image is loaded
-   console.log("latestImage.src:", latestImage.src);
-  if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-    document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
-    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
-    return; // Stop further execution
-  } 
-  
-  const checkboxes = document.getElementsByName('controlCheckbox');
-  let msg1 = "x"; // Default if none checked
-  for (let i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1); // +1 for human-friendly index
-      break; // Stop after finding the first checked
-    }
-  }
-console.log("msg1:", msg1);
-  // Now get location and send after it's updated
-
-  getLocation(() => {
-    console.log("getLocation callback");
-    sendSample(msg1, null, usernameValue);
-  });// Add at top
-let sending = false;
-
-function getCheckedControlIndex() {
-  if (sending) return; // Prevent double send
-
-  if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-    document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
-    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
-    return;
-  }
-
-  sending = true;
-  document.getElementById("msg5").innerHTML = "Enviando / Sending...";
-  customBtn2.disabled = true; // Disable send button
-
-  const checkboxes = document.getElementsByName('controlCheckbox');
-  let msg1 = "x";
-  for (let i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1);
-      break;
-    }
-  }
-
-  getLocation((location) => {
-    // Double-check image is still present
-    if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-      document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
-      sending = false;
-      customBtn2.disabled = false;
-      return;
-    }
-    sendSample(msg1, null, usernameValue, location);
-  });
-}
-
-function sendSample(msg1, showDt, usernameValue, location) {
-  // ...existing code...
-  fetch('http://localhost:3000/upload', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => res.ok ? res.json() : Promise.reject(res))
-  .then(data => {
-    document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
-    sending = false;
-    customBtn2.disabled = false;
-  })
-  .catch(err => {
-    document.getElementById("msg5").innerHTML = "Error sending data";
-    sending = false;
-    customBtn2.disabled = false;
-  });
-}
-
-
-}*/
 // Add at top
 let sending = false;
 
@@ -984,6 +875,7 @@ function getLocation(callback) {
         const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
         document.getElementById("msg4").innerHTML = loc;
         if (callback) callback(loc);
+        
       },
       function() {
         document.getElementById("msg4").innerHTML = "N/A";
@@ -1000,48 +892,8 @@ function getLocation(callback) {
 
 
   
-//-----
-/*function getLocation(callback) {
-   console.log("Entering getLocation");
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        const loc = "Latitude:" + position.coords.latitude + ",Longitude:" + position.coords.longitude;
-        document.getElementById("msg4").innerHTML = loc;
-        if (callback) callback(loc);
-      },
-      function() {
-        document.getElementById("msg4").innerHTML = "N/A";
-        if (callback) callback("N/A");
-      }
-    );
-  } else {
-    document.getElementById("msg4").innerHTML = "Geolocation is not supported by this browser.";
-    if (callback) callback("N/A");
-  }
-   console.log("Exiting getLocation");
-} */
 
-/*function getCheckedControlIndex() {
-  if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-    document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
-    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
-    return;
-  }
 
-  const checkboxes = document.getElementsByName('controlCheckbox');
-  let msg1 = "x";
-  for (let i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1);
-      break;
-    }
-  }
-
-  getLocation((location) => {
-    sendSample(msg1, null, usernameValue, location);
-  });
-} */
 function sendSample(msg1, showDt, usernameValue, location) {
    console.log("Entering sendSample");
   // Always get the current date/time when sending
@@ -1084,7 +936,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
  console.log("Entering fetch");
- fetch('http://127.0.0.1:3000/upload', {
+ fetch('http://localhost:3000/upload', {
   method: 'POST',
   body: formData
 })
@@ -1117,98 +969,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
 
 }
 
-//from here active 7-3-25
-/*function sendSample(msg1, showDt, usernameValue, location) {
-  
-  // Use location instead of photoLocation.innerHTML
-  const safeLocation = sanitizeForFilename(location || "");
-  
-}
 
-function sendSample(msg1, showDt, usernameValue) {
-  
-  console.log("sendSample called with msg1:", msg1, "showDt:", showDt, "usernameValue:", usernameValue);
-  
-  // Always get the current date/time when sending
-  const dt = new Date();
-  let showDtNow = (dt.getDate()+"/"+(dt.getMonth()+1)+"/"+dt.getFullYear());
-  let Th = dt.getHours();
-  if (Th < 10) Th = "0" + Th;
-  showDtNow = showDtNow + "  " + Th;
-  let Tm = dt.getMinutes();
-  if (Tm < 10) Tm = "0" + Tm;
-  showDtNow = showDtNow + ":" + Tm;
-
-  const photoLocation = document.getElementById("msg4");
-  document.getElementById("msg1").innerHTML = "Control: " + msg1;
-  document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDtNow;
-  document.getElementById("msg3").innerHTML = "User: " + usernameValue;
-  document.getElementById("msg4").innerHTML = photoLocation.innerHTML;
-
-  // Build FormData and Blob here, every time
-  const formData = new FormData();
-
-// Sanitize location for filename (remove HTML tags, spaces, and special chars)
-
-
-function sanitizeForFilename(str) {
-  return str.replace(/<[^>]*>?/gm, '') // Remove HTML tags
-            .replace(/[^\w.-]+/g, '_'); // Replace non-filename chars with _
-}
-
-let safeDt = showDtNow.replace(/[^\w.-]+/g, '_'); // Add this line
-const safeLocation = sanitizeForFilename(photoLocation.innerHTML);
-const safeUser = sanitizeForFilename(usernameValue || 'nouser');
-const filename = `Datetime${safeDt}_User${safeUser}_${safeLocation}.jpg`;
-
-const blob = dataURLtoBlob(latestImage.src);
-if (blob) {
-  formData.append('image', blob, filename);
-}
-//to here active
-
-//from here inactive 7-3-25
-  /* // Defensive: Only append image if valid
-  const blob = dataURLtoBlob(latestImage.src);
-  if (blob) {
-    formData.append('image', blob, currentFileName || (showDtNow + "_" + photoLocation.innerHTML + ".jpg"));
-  }
-  formData.append('control', msg1);
-  formData.append('datetime', showDtNow);
-  formData.append('user', usernameValue);
-  formData.append('location', photoLocation.innerHTML); */
-
-  // For testing: show data
-  /*dataToSend = latestImage.src + "," + "Control: " + msg1 + "," + showDtNow + "User: " + usernameValue + photoLocation.innerHTML;
-  // ...inside sendSample()...
-  document.getElementById("msg5").innerHTML = "Enviando / Sending...";
-
-  setTimeout(() => {
-    document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
-    setTimeout(() => {
-      document.getElementById("msg5").innerHTML = "LIMPIANDO / RESET";
-      setTimeout(() => {
-        resetScreen();
-      }, 1500); // Wait 1.5s before reset
-    }, 2000); // Show "ENVIADO / SENT" for 2s
-  }, 5000); // Initial wait for "Enviando / Sending..."*/
-//thru here inactive
-
-  // Uncomment and use this when you have a server:******** */
-  // from here to end-here 99 - 7-3-25 was active
- /* fetch('http://localhost:3000/upload', {
-    method: 'POST',
-    body: formData
-  })
-  .then(res => res.ok ? res.json() : Promise.reject(res))
-  .then(data => {
-    document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
-  })
-  .catch(err => {
-    document.getElementById("msg5").innerHTML = "Error sending data";
-  });
-  //end here 99
-}*/
 
 // Convert Data URL to Blob and append with filename
 function dataURLtoBlob(dataurl) {
