@@ -425,6 +425,15 @@ if (dt.getMinutes() < 10) {
     showDt = (showDt +":"+ Tm)
   }
 
+let Ts = (dt.getSeconds())
+if (dt.getSeconds() < 10) {
+  (Ts = "0"+Ts)
+  showDt = (showDt +":"+ Tm)
+} else {
+    showDt = (showDt +":"+ Ts)
+  }
+
+
 document.getElementById("dateToday").innerHTML = showDt;
 
 
@@ -952,7 +961,9 @@ function sendSample(msg1, showDt, usernameValue, location) {
   let Tm = dt.getMinutes();
   if (Tm < 10) Tm = "0" + Tm;
   showDtNow = showDtNow + ":" + Tm;
-
+  let Ts = dt.getSeconds();
+  if (Ts < 10) Ts = "0" + Ts;
+  showDtNow = showDtNow + ":" + Ts;
   // Use location from argument, fallback to msg4 if missing
   let locationStr = location || document.getElementById("msg4").innerHTML;
 
@@ -983,7 +994,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
  console.log("Entering fetch");
- fetch('https://ict-sentence-preparation-km.trycloudflare.com/upload', {
+ fetch('https://olympics-nicaragua-fees-crimes.trycloudflare.com/upload', {
   method: 'POST',
   body: formData
 })
