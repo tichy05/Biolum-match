@@ -93,11 +93,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-width: 220px;
-      min-height: 280px;
+      min-width: 210px;
+      min-height: 300px;
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 220px 280px;
+      background-size: 210px 300px;
       background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
     }
 
@@ -121,7 +121,7 @@
       font-size: 12pt;
       color: #c2bfbf;
       box-sizing: border-box;
-      overflow-y: auto;
+      
     }
     .thumb {
       width: 80%;
@@ -300,8 +300,8 @@
   }
 #imageContainer {
    min-width: 190px;
-   min-height: 270px;
-   background-size: 190px 270px;
+   min-height: 280px;
+   background-size: 190px 280px;
 }
 
 }
@@ -384,19 +384,21 @@
         <input type="text" name="img3" placeholder="URL or file for IB # 4">
         <input type="text" name="img4" placeholder="URL or file for IB # 5">
       </label><br>
-      
-      <label>
-        Email to send data to: <input type="email" name="email" disabled placeholder="CURRRENTLY NOT USED">
-      </label><br>
-      <label>
+       <label>
         Sending Employee/volunter # : <input type="text" name="username" placeholder="Username - see main list">
       </label><br>
+         <button type="submit">Save</button>
+         <button type="button" onclick="closeConfig()">Cancel</button>
+         
+        <label><br><br>
+        Email to send data to: <input type="email" name="email" disabled placeholder="CURRRENTLY NOT USED">
+      </label><br>
+     
       <label>
-        Show EXIF (image details - future use - leave unchecked):
+        Show EXIF (image details - future use):
         <input type="checkbox" name="exifOn" disabled>
       </label><br>
-      <button type="submit">Save</button>
-      <button type="button" onclick="closeConfig()">Cancel</button>
+   
     </form>
   </div>
   
