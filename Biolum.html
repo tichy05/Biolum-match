@@ -94,10 +94,10 @@
       align-items: center;
       justify-content: center;
       min-width: 210px;
-      min-height: 300px;
+      min-height: 280px;
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 210px 300px;
+      background-size: 210px 280px;
       background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
     }
 
@@ -121,6 +121,7 @@
       font-size: 12pt;
       color: #c2bfbf;
       box-sizing: border-box;
+      overflow-y: auto;
     }
     .thumb {
       width: 80%;
@@ -1159,6 +1160,9 @@ function sendSample(msg1, showDt, usernameValue, location) {
   document.getElementById("msg5").innerHTML = "Error sending data";
   sending = false;
   customBtn2.disabled = false;
+  setTimeout(() => {
+        resetScreen();
+      }, 3000); // Wait 3s before reset
 });
 
 }
