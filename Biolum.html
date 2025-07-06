@@ -569,7 +569,7 @@ function checkOrientation() {
     configModal.style.minHeight = '350px';
     configModal.style.overflowY = 'auto';
 
-    if (isLandscape) {
+   /* if (isLandscape) {
       configModal.style.top = '0';
       configModal.style.left = '50%';
       configModal.style.transform = 'translateX(-50%)';
@@ -581,8 +581,8 @@ function checkOrientation() {
       configModal.style.transform = 'translate(-50%, -50%)';
       configModal.style.alignItems = 'center';
       configModal.style.justifyContent = 'center';
-    }
-  }
+    } */
+  } 
 }
 window.addEventListener('resize', checkOrientation);
 window.addEventListener('load', checkOrientation);
