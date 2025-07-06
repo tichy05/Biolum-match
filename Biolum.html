@@ -446,7 +446,7 @@ let appname = ""
 // Load control images from JSON file (shared for all users)
 async function loadControlImagesFromJSON() {
   try {
-    const res = await fetch('controlImages.json');
+    const res = await fetch('https://tichy05.github.io/Biolum-match/controlImages');
     const data = await res.json();
     /* // If your images are in the same folder, just use the names
     controlImages = (data.controlImages || []).map(name =>
