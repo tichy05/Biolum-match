@@ -1159,12 +1159,12 @@ function sendSample(msg1, showDt, usernameValue, location) {
 })
 .catch(err => {
   console.log(err);
-  document.getElementById("msg5").innerHTML = "Error sending data";
+  document.getElementById("msg5").innerHTML = "<span style='color: red; weight= 200'>ERROR SENDING DATA</span>";
   sending = false;
   customBtn2.disabled = false;
   setTimeout(() => {
         resetScreen();
-      }, 3000); // Wait 3s before reset
+      }, 5000); // Wait 3s before reset
 });
 
 }
