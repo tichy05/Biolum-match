@@ -983,7 +983,7 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
  console.log("Entering fetch");
- fetch('http://localhost:3000/upload', {
+ fetch('https://acrobat-poultry-differential-specialist.trycloudflare.com/upload', {
   method: 'POST',
   body: formData
 })
