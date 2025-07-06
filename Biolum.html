@@ -899,7 +899,7 @@ function getCheckedControlIndex() {
   customBtn2.disabled = true; // Disable send button
 
   const checkboxes = document.getElementsByName('controlCheckbox');
-  let msg1 = "x";
+  let msg1 = "NoCom";
   for (let i = 0; i < checkboxes.length; i++) {
     if (checkboxes[i].checked) {
       msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1);
