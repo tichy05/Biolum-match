@@ -3,14 +3,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimal-ui"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <link rel="icon" type="image/png" href="https://tichy05.github.io/Biolum-match/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://tichy05.github.io/Biolum-match/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="152x152" href="https://tichy05.github.io/Biolum-match/apple-touch-icon-152x152.png">
   
-  <title>Perceived Bioluminescence Comparison</title>
+  <title>Biolum V37</title>
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <style>
 
@@ -385,7 +385,10 @@
         <input type="text" name="img4" placeholder="URL or file for IB # 5">
       </label><br>
        <label>
-        Sending Employee/volunter # : <input type="text" name="username" placeholder="Username - see main list">
+         User: <input type="text" name="username" placeholder="User Id">
+      </label><br>
+      <label>
+         Language: <input type="text" name="currentLang" placeholder="en / es">
       </label><br>
          <button type="submit">Save</button>
          <button type="button" onclick="closeConfig()">Cancel</button>
@@ -452,14 +455,96 @@ let controlImages = [];
 let exifEnabled = false;
 let emailName = "";
 let usernameValue = "";
-let appname = ""
+let appname = "";
+let nousermsg = "";
+
+// Language data
+
+const langData = {
+  es: {
+    langBtn: "EN",
+    nousermsg: "Primera vez: ir a configuración y especificar usuario asignado",
+    title: "Imagenes de Control",
+    headercont: "INSTRUCCIONES",
+    numuser: "USUARIO:",
+    appname: "BIOLUM",
+    restart: "Entre el usuario asignado, oprima Save, cierre el app y recargue",
+    instructions: `📷 Instrucciones:<br/>
+      1. Lleve la pantalla de su celular al máximo de brillo<br/>
+      2. Oprima "Abrir Cámara"<br/>
+      3. Verifique el "flash" este apagado<br/>
+      4. Usted debe estar lo mas estable posible<br/>
+      5. Ponga la cámara a unos tres (3) pies (91,44 cm) de la superficie 
+      del agua<br/>
+      6. Enfoque la cámara y tome la foto<br/>
+      7. Si la foto salió bien, presione "Use", si no, "Retake"<br/>
+      8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Presionando sobre las imagenes control, se sobrepondrán a la muestra por un segundo<br/>
+      9. Una vez escoja el control mas aproximado en brillantez, marcará el cuadro en blanco debajo de su nombre<br/>
+      10. Presione "Enviar Muestra"<br/>
+      11. Si no marca ningún cuadro antes de enviar, se enviará la muestra sin comparación<br/>
+      Gracias por contribuir con este proyecto`,
+    chooseFile: "Abrir Cámara",
+    sendSample: "Enviar Muestra",
+    noFile: "",
+    rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
+    levels: idx => `IB # ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Tiempo de exposición: 1/${exposure || ''} ms<br/>
+      f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Longitud focal: ${focus || 'N/A'}
+    `
+  },
+  en: {
+    langBtn: "ES",
+    nousermsg: "First time: Please go to settings and enter assigned User ID",
+    title: "Control Images",
+     headercont: "INSTRUCTIONS",
+     numuser: "USER:",
+     appname: "BIOLUM",
+    restart: "Enter assigned userid and press Save; exit app & reload",
+    instructions: `📷 Instructions:<br/>
+      1. Set your smartphone to max screen brilliance<br/>
+      2. Press "Open Camera"<br/>
+      3. Verify the flash is off<br/>
+      4. You must be as stabilized as possible<br/>
+      5. Hold the camera about three (3) feet (91,44 cm) from the water's surface<br/>
+      6. Focus the camera and take the picture<br/>
+      7. If the image looks ok, press "Use", else "Retake"<br/>
+      8. Try to match the brilliance of the sample taken, with the control images on your left.  You can press on the control images, they will cover the sample for a second, and it's easier to see the difference<br/>
+      9. Select the most aproximate control image in terms of brilliance, and mark the white square below their name<br/>
+      10. Press "Send Sample"<br/>
+      11. If no control image is marked, the image will be sent unmatched
+      Thanks for your contribution to this project`,
+    chooseFile: "Open Camera",
+    sendSample: "Send Sample",
+    noFile: "",
+    rotate: "Please rotate your device to landscape mode",
+    levels: idx => `IB # ${idx + 1}`,
+    exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Exposure time: 1/${exposure || ''} ms<br/>
+      f📷   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Focal length: ${focus || 'N/A'}
+    `
+  }
+};
+
+let currentLang = 'es';
+let instrToggle = 'no';
+
 
 
 // Load control images from JSON file (shared for all users)
 async function loadControlImagesFromJSON() {
   try {
-    const res = await fetch('https://tichy05.github.io/Biolum-match/controlImages');
+    const res = await fetch('https://tichy05.github.io/Biolum-match/controlImages.json');
     const data = await res.json();
+    controlImages = (data.controlImages); 
+
+   
     /* // If your images are in the same folder, just use the names
     controlImages = (data.controlImages || []).map(name =>
       name.startsWith('http') ? name : name
@@ -468,7 +553,6 @@ async function loadControlImagesFromJSON() {
 
   } catch (e) {
     // fallback to default if fetch fails
-    console.log ("fallback load");
     controlImages = [
   'https://tichy05.github.io/Biolum-match/IB_1.jpg', 
   'https://tichy05.github.io/Biolum-match/IB_2.jpg', 
@@ -499,17 +583,43 @@ function loadConfig() {
   const saved = localStorage.getItem('biolumConfig');
   if (saved) {
     const cfg = JSON.parse(saved);
+    if (typeof cfg.currentLang === "string") currentLang = cfg.currentLang;
     if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
     if (typeof cfg.emailName === "string") emailName = cfg.emailName;
     if (typeof cfg.username === "string") {
-      usernameValue = cfg.username;
-    } else {
-      usernameValue = "";
+        
+        currentLang = cfg.currentLang;
+        currentLang = currentLang.trim();
+      if (currentLang === "") {
+        currentLang = "es";
+
+        }
+        usernameValue = cfg.username;
+        usernameValue = usernameValue.trim();
+        if (usernameValue === "") {
+          
+          openConfig();
+        
+          document.getElementById("msg5").innerHTML = langData.es.restart;
+       
+        } else {
+          usernameValue = cfg.username;
+        }
     }
+    }
+      /*  if (cfg.username === "  ") {
+          console.log ("null value")
+            usernameValue = "";
+            document.getElementById("msg5").innerHTML = nousermsg;
+    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 3000);
+    return;*/
   }
-}
+         
+  
+  
 
 loadConfig();
+
 
 // close config form
 function closeConfig() {
@@ -521,7 +631,7 @@ function closeConfig() {
 // Save config to localStorage
 function saveConfig() {
   localStorage.setItem('biolumConfig', JSON.stringify({
-    controlImages, exifEnabled, emailName, username: usernameValue
+    controlImages, exifEnabled, emailName, username: usernameValue, currentLang
   }));
 }
 /*window.addEventListener('DOMContentLoaded', () => {
@@ -532,6 +642,7 @@ function saveConfig() {
 window.addEventListener('DOMContentLoaded', async () => {
   await loadControlImagesFromJSON();
   setLang(currentLang);
+  console.log ("1",currentLang);
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
 });
@@ -550,6 +661,7 @@ const currentExif = 'none';
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(currentLang);
+   console.log ("2",currentLang);
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
 
@@ -603,9 +715,10 @@ window.addEventListener('orientationchange', () => {
 
 // Language data
 
-const langData = {
+/*const langData = {
   es: {
     langBtn: "EN",
+    nousermsg: "Favor ir a configuración y especificar usuario asignado",
     title: "Imagenes de Control",
     headercont: "INSTRUCCIONES",
     numuser: "USUARIO:",
@@ -639,6 +752,7 @@ const langData = {
   },
   en: {
     langBtn: "ES",
+    nousermsg: "Please go to settings and enter assignated User ID",
     title: "Control Images",
      headercont: "INSTRUCTIONS",
      numuser: "USER:",
@@ -672,15 +786,18 @@ const langData = {
 };
 
 let currentLang = 'es';
-let instrToggle = 'no';
+let instrToggle = 'no';*/
 
 
 // add flags  to lNG BUTTONS
 
 function setLang(lang) {
-  currentLang = lang;
+  
+  /*currentLang = lang; */
+  console.log ("mmm",lang);
   const langToggle = document.getElementById('langToggle');
   langToggle.textContent = langData[lang].langBtn;
+
 
   // Set flag background
   if (lang === 'es') {
@@ -722,10 +839,12 @@ function setLang(lang) {
 // Toggle language on button click
 document.getElementById('langToggle').onclick = function() {
   setLang(currentLang === 'es' ? 'en' : 'es');
+   console.log ("3",currentLang);
 };
 
 // Initial language setup
 window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
+ console.log ("4",currentLang);
 
 
 // Update EXIF display to use language
@@ -759,6 +878,7 @@ function openConfig() {
   for (let i = 0; i < 5; i++) {
     form['img'+i].value = controlImages[i] || '';
   }
+  form.currentLang.value = currentLang;
   form.exifOn.checked = exifEnabled;
   form.email.value = emailName || '';
   form.username.value = usernameValue || ''; // <-- This line ensures the username persists
@@ -776,11 +896,13 @@ document.getElementById('configForm').onsubmit = function(e) {
   exifEnabled = this.exifOn.checked;
   emailName = this.email.value;
   usernameValue = this.username.value;
+ currentLang = this.currentLang.value;
   saveConfig();
   closeConfig();
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
   setLang(currentLang); // Update username display
+   console.log ("5",currentLang);
 };
 
 
