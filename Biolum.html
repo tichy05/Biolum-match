@@ -406,7 +406,11 @@
   </div>
   
 <script>
-
+window.addEventListener('resize', checkOrientation);
+window.addEventListener('load', checkOrientation);
+window.addEventListener('orientationchange', () => {
+  setTimeout(checkOrientation, 300);
+});
 
 //get system date and time into header and into file to send
 const dt = new Date();
@@ -539,10 +543,12 @@ let instrToggle = 'no';
 
 // Load control images from JSON file (shared for all users)
 async function loadControlImagesFromJSON() {
+   console.log ("entering loadcontrolImagesfromjson");
   try {
     const res = await fetch('https://tichy05.github.io/Biolum-match/controlImages.json');
     const data = await res.json();
     controlImages = (data.controlImages); 
+   
 
    
     /* // If your images are in the same folder, just use the names
@@ -580,6 +586,7 @@ function loadConfig() {
 
   // Load config from localStorage (only for username, exif, email)
 function loadConfig() {
+  console.log ("entering loadconfig")
   const saved = localStorage.getItem('biolumConfig');
   if (saved) {
     const cfg = JSON.parse(saved);
@@ -623,6 +630,7 @@ loadConfig();
 
 // close config form
 function closeConfig() {
+  console.log ("entering closeconfig");
  document.getElementById('configModal').style.display = 'none';
  document.body.style.overflow = ''; // Restore scroll
 }
@@ -642,7 +650,6 @@ function saveConfig() {
 window.addEventListener('DOMContentLoaded', async () => {
   await loadControlImagesFromJSON();
   setLang(currentLang);
-  console.log ("1",currentLang);
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
 });
@@ -661,7 +668,6 @@ const currentExif = 'none';
 
 window.addEventListener('DOMContentLoaded', () => {
   setLang(currentLang);
-   console.log ("2",currentLang);
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
 
@@ -675,6 +681,7 @@ customBtn.onclick = () => window.fileInput.click();
 
 
 function checkOrientation() {
+  console.log ("entering checkorientation");
   const warning = document.getElementById('rotateWarning');
   const configModal = document.getElementById('configModal');
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
@@ -792,9 +799,9 @@ let instrToggle = 'no';*/
 // add flags  to lNG BUTTONS
 
 function setLang(lang) {
+  console.log ("entering setlang");
   
   /*currentLang = lang; */
-  console.log ("mmm",lang);
   const langToggle = document.getElementById('langToggle');
   langToggle.textContent = langData[lang].langBtn;
 
@@ -839,12 +846,11 @@ function setLang(lang) {
 // Toggle language on button click
 document.getElementById('langToggle').onclick = function() {
   setLang(currentLang === 'es' ? 'en' : 'es');
-   console.log ("3",currentLang);
 };
 
 // Initial language setup
 window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
- console.log ("4",currentLang);
+
 
 
 // Update EXIF display to use language
@@ -859,6 +865,7 @@ window.fileInput.addEventListener('change', handleFileInputChange);
 
 
 function showInstructions() {
+  console.log ("entering showinstructions");
   if (instrToggle === "yes") {
     document.getElementById('instructions').innerHTML = "";
     instrToggle = "no";
@@ -874,6 +881,7 @@ function showInstructions() {
 // Show config modal
 
 function openConfig() {
+  console.log ("entering openconfig");
   const form = document.getElementById('configForm');
   for (let i = 0; i < 5; i++) {
     form['img'+i].value = controlImages[i] || '';
@@ -902,7 +910,6 @@ document.getElementById('configForm').onsubmit = function(e) {
   reloadControlThumbnails();
   exifData.style.display = exifEnabled ? '' : 'none';
   setLang(currentLang); // Update username display
-   console.log ("5",currentLang);
 };
 
 
@@ -911,6 +918,7 @@ document.getElementById('configForm').onsubmit = function(e) {
 
 
 function reloadControlThumbnails() {
+  console.log ("entering reloadcontrolthumbnails");
   // Remove all children except the H3 and instructions
   const keep = new Set(['H3', 'instructions']);
   let i = 0;
@@ -1065,7 +1073,6 @@ function getLocation(callback) {
     document.getElementById("msg4").innerHTML = "Geolocation is not supported by this browser.";
     if (callback) callback("N/A");
   }
-   console.log("Exiting getLocation");
 }
 
 
@@ -1093,11 +1100,11 @@ function sendSample(msg1, showDt, usernameValue, location) {
   document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDtNow;
   document.getElementById("msg3").innerHTML = "User: " + usernameValue;
   document.getElementById("msg4").innerHTML = locationStr;
- console.log("msgs1 thru 4 written");
   // Build FormData and Blob here, every time
   const formData = new FormData();
 
   function sanitizeForFilename(str) {
+    console.log ("entering sanitizeforfilenamme");
     return str.replace(/<[^>]*>?/gm, '') // Remove HTML tags
               .replace(/[^\w.-]+/g, '_'); // Replace non-filename chars with _
   }
@@ -1115,19 +1122,17 @@ function sendSample(msg1, showDt, usernameValue, location) {
   formData.append('datetime', showDtNow);
   formData.append('user', usernameValue);
   formData.append('location', locationStr);
- console.log("Entering fetch");
+
  fetch('https://olympics-nicaragua-fees-crimes.trycloudflare.com/upload', {
   method: 'POST',
   body: formData
 })
 .then(res => {
-  console.log(res);
   if (!res.ok) throw new Error("HTTP error " + res.status);
   // Try to parse JSON, but if it fails, just continue
   return res.text().then(text => {
     try { return JSON.parse(text); }
     catch { return {}; }
-    console.log(res);
   });
 })
 .then(data => {
@@ -1141,7 +1146,6 @@ function sendSample(msg1, showDt, usernameValue, location) {
 
 })
 .catch(err => {
-  console.log(err);
   document.getElementById("msg5").innerHTML = "<span style='color: red; weight= 200'>ERROR SENDING DATA</span>";
   sending = false;
   customBtn2.disabled = false;
@@ -1234,7 +1238,7 @@ function resetScreen() {
 
 
 function handleFileInputChange(event) {
-  console.log("window.fileInput changed");
+  console.log ("entering handlefileinput");
   const file = event.target.files[0];
   if (file) {
     latestImage.style.display = "block";
