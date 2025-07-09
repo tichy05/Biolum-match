@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="152x152"
     href="https://tichy05.github.io/Biolum-match/apple-touch-icon-152x152.png">
   <title>Biolum</title>
-  <!--Biolum V1.0 (v37 7/8/2025) JCFP -->
+  <!--Biolum V1.0 (v40 7/9/2025) JCFP -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <style>
     html,
@@ -521,6 +521,8 @@
         sending: "Enviando...",
         sent: "Enviado exitosamente",
         geolocat: "Este navegador (browser) no tiene geolocalización",
+        errorsending: "ERROR ENVIANDO DATA",
+        servernotav: "Servidor no disponible; favor reintentar enn unos momentos.",
         instructions: `📷 Instrucciones:<br/>
       1. Lleve la pantalla de su celular al máximo de brillo<br/>
       2. Oprima "Abrir Cámara"<br/>
@@ -559,6 +561,8 @@
         sending: "Sending...",
         sent: "Sent successfully",
         geolocat: "Geolocation is not supported by this browser",
+        errorsending: "ERROR SENDING DATA",
+        servernotav: "Server is not available. Please try again later.",
         instructions: `📷 Instructions:<br/>
       1. Set your smartphone to max screen brilliance<br/>
       2. Press "Open Camera"<br/>
@@ -619,25 +623,11 @@
         ];
       }
     }
-    /* // Load config from localStorage (biolumConfig.json) if available
-    function loadConfig() {
-      const saved = localStorage.getItem('biolumConfig');
-      if (saved) {
-        const cfg = JSON.parse(saved);
-        if (Array.isArray(cfg.controlImages)) controlImages = cfg.controlImages;
-        if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
-        if (typeof cfg.emailName === "string") emailName = cfg.emailName;
-       /* if (typeof cfg.username === "string") username = cfg.username; */
-    /* if (typeof cfg.username === "string") {
-       usernameValue = cfg.username;
-     } else {
-       usernameValue = "";
-     }
-   }}; */
+   
 
     // Load config from localStorage (only for username, exif, email)
     function loadConfig() {
-      console.log ("entering loadconfig")
+      console.log("entering loadconfig")
       const saved = localStorage.getItem('biolumConfig');
       if (saved) {
         const cfg = JSON.parse(saved);
@@ -646,30 +636,21 @@
         if (typeof cfg.emailName === "string") emailName = cfg.emailName;
         if (typeof cfg.username === "string") {
 
-  
+
           usernameValue = cfg.username;
           usernameValue = usernameValue.trim();
         }
       }
-      /*  if (cfg.username === "  ") {
-          console.log ("null value")
-            usernameValue = "";
-            document.getElementById("msg5").innerHTML = nousermsg;
-    setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 3000);
-    return;*/
-
+     
 
     }
-
-
-
 
     loadConfig();
 
 
     // close config form
     function closeConfig() {
-      console.log ("entering closeconfig");
+      console.log("entering closeconfig");
       document.getElementById('configModal').style.display = 'none';
       document.body.style.overflow = ''; // Restore scroll
     }
@@ -677,12 +658,12 @@
 
     // Save config to localStorage
     function saveConfig() {
-      console.log ("entering saveConfig");
+      console.log("entering saveConfig");
       localStorage.setItem('biolumConfig', JSON.stringify({
         controlImages, exifEnabled, emailName, username: usernameValue, currentLang
-      
+
       }));
-   
+
     }
     /*window.addEventListener('DOMContentLoaded', () => {
       setLang(currentLang);
@@ -709,7 +690,7 @@
 
 
     window.addEventListener('DOMContentLoaded', () => {
-     setLang(currentLang);
+      setLang(currentLang);
       reloadControlThumbnails();
       exifData.style.display = exifEnabled ? '' : 'none';
 
@@ -723,7 +704,7 @@
 
 
     function checkOrientation() {
-      console.log ("entering checkorientation");
+      console.log("entering checkorientation");
       const warning = document.getElementById('rotateWarning');
       const configModal = document.getElementById('configModal');
       const isLandscape = window.matchMedia("(orientation: landscape)").matches;
@@ -764,11 +745,11 @@
     // add flags  to lNG BUTTONS
 
     function setLang(lang) {
-   console.log ("Entering setLang");
-      currentLang = lang; 
+      console.log("Entering setLang");
+      currentLang = lang;
       const langToggle = document.getElementById('langToggle');
       langToggle.textContent = langData[lang].langBtn;
-   
+
 
 
       // Set flag background
@@ -966,10 +947,10 @@
     let sending = false;
 
     function getCheckedControlIndex() {
-      console.log ("Entering getCheckedControlIndex");
+      console.log("Entering getCheckedControlIndex");
 
       lang = currentLang;
-  
+
       if (sending) return; // Prevent double send
 
       if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
@@ -978,11 +959,11 @@
         return;
       }
       if (usernameValue === "") {
-          document.getElementById("msg5").innerHTML = langData[lang].nousermsg;
-          return;
+        document.getElementById("msg5").innerHTML = langData[lang].nousermsg;
+        return;
       }
-    
-      
+
+
       sending = true;
       document.getElementById("msg5").innerHTML = langData[lang].sending; /*"Enviando / Sending...";*/
       customBtn2.disabled = true; // Disable send button
@@ -1001,41 +982,41 @@
         if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
           /*document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
           */
-         document.getElementById("msg5").innerHTML = langData[lang].latestImage;
+          document.getElementById("msg5").innerHTML = langData[lang].latestImage;
           sending = false;
           customBtn2.disabled = false;
           return;
         }
         sendSample(msg1, null, usernameValue, location);
       });
-    
 
-    // Get GPS location and limit decimal places because its used in filename
-    // 8 decimal places is millimeter accuracy
-    function getLocation(callback) {
-      console.log("Entering getLocation");
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            // Limit latitude and longitude to 8 decimal places
-            const lat = position.coords.latitude.toFixed(8);
-            const lng = position.coords.longitude.toFixed(8);
-            const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
-            document.getElementById("msg4").innerHTML = loc;
-            if (callback) callback(loc);
 
-          },
-          function () {
-            document.getElementById("msg4").innerHTML = "N/A";
-            if (callback) callback("N/A");
-          }
-        );
-      } else {
-        document.getElementById("msg4").innerHTML = lagdata[lang],geolocat;
-        if (callback) callback("N/A");
+      // Get GPS location and limit decimal places because its used in filename
+      // 8 decimal places is millimeter accuracy
+      function getLocation(callback) {
+        console.log("Entering getLocation");
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              // Limit latitude and longitude to 8 decimal places
+              const lat = position.coords.latitude.toFixed(8);
+              const lng = position.coords.longitude.toFixed(8);
+              const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
+              document.getElementById("msg4").innerHTML = loc;
+              if (callback) callback(loc);
+
+            },
+            function () {
+              document.getElementById("msg4").innerHTML = "N/A";
+              if (callback) callback("N/A");
+            }
+          );
+        } else {
+          document.getElementById("msg4").innerHTML = lagdata[lang], geolocat;
+          if (callback) callback("N/A");
+        }
       }
     }
-  }
 
 
     function sendSample(msg1, showDt, usernameValue, location) {
@@ -1067,9 +1048,11 @@
           .replace(/[^\w.-]+/g, '_'); // Replace non-filename chars with _
       }
       let safeDt = showDtNow.replace(/[^\w.-]+/g, '_');
+      
+      const safeControl = sanitizeForFilename(msg1);
       const safeLocation = sanitizeForFilename(locationStr);
       const safeUser = sanitizeForFilename(usernameValue || 'nouser');
-      const filename = `Datetime${safeDt}_User${safeUser}_${safeLocation}.jpg`;
+      const filename = `Datetime${safeDt}_Control_${safeControl}_User${safeUser}_${safeLocation}.jpg`;
 
       const blob = dataURLtoBlob(latestImage.src);
       if (blob) {
@@ -1080,36 +1063,77 @@
       formData.append('user', usernameValue);
       formData.append('location', locationStr);
 
-      fetch('https://realized-ventures-chancellor-engage.trycloudflare.com/upload', {
+      
+      fetch('https://ratios-whole-eleven-groove.trycloudflare.com/upload', {
         method: 'POST',
         body: formData
       })
+
         .then(res => {
-          if (!res.ok) throw new Error("HTTP error " + res.status);
-          // Try to parse JSON, but if it fails, just continue
+          const statusCode = res.status;
+
           return res.text().then(text => {
-            try { return JSON.parse(text); }
-            catch { return {}; }
+            let data;
+            try {
+              data = text ? JSON.parse(text) : {};
+            } catch {
+              data = {};
+            }
+
+            if (!res.ok) {
+              const error = new Error("HTTP error " + statusCode);
+              error.status = statusCode;
+              error.responseData = data;
+              throw error;
+            }
+
+            return data;
           });
         })
-        .then(data => {
-          document.getElementById("msg5").innerHTML = langdata[lang].sent;
-          sending = false;
-          customBtn2.disabled = false;
-          setTimeout(() => {
-            resetScreen();
-          }, 3000); // Wait 3s before reset
+ 
+  .then(data => {
+  if (data.status !== 'ok') {
+    throw new Error('Unexpected server response');
+  }
+
+  // Show success message including CSV and file info
+  const fileMsg = data.filename ? `File: ${data.filename}` : '';
+  document.getElementById("msg5").innerHTML =
+    `<span style='color: green;'>✅ ${data.message}<br>✅ ${fileMsg}</span>`;
+
+  sending = false;
+  customBtn2.disabled = false;
+
+  setTimeout(() => {
+    resetScreen();
+  }, 5000);
+})
 
 
-        })
-        .catch(err => {
-          document.getElementById("msg5").innerHTML = "<span style='color: red; weight= 200'>ERROR SENDING DATA</span>";
-          sending = false;
-          customBtn2.disabled = false;
-          setTimeout(() => {
-            resetScreen();
-          }, 5000); // Wait 5s before reset
-        });
+ 
+.catch(err => { 
+  let errorMessage = langData[lang].errorsending;  
+
+  // Detect no response (server down / network error)
+  if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
+    errorMessage = langData[lang].servernotav;   
+  } else if (err.status) {
+    errorMessage = `Error ${err.status}`;
+  } else if (err.message) {
+    errorMessage = err.message;
+  }
+
+  document.getElementById("msg5").innerHTML =
+    `<span style='color: red; font-weight: 200;'>${errorMessage}</span>`;
+
+  sending = false;
+  customBtn2.disabled = false;
+
+  setTimeout(() => {
+    resetScreen();
+  }, 5000);
+});
+
 
     }
 
