@@ -1063,11 +1063,9 @@
       const formData = new FormData();
 
       function sanitizeForFilename(str) {
-        console.log("entering sanitizeforfilenamme");
         return str.replace(/<[^>]*>?/gm, '') // Remove HTML tags
           .replace(/[^\w.-]+/g, '_'); // Replace non-filename chars with _
       }
-
       let safeDt = showDtNow.replace(/[^\w.-]+/g, '_');
       const safeLocation = sanitizeForFilename(locationStr);
       const safeUser = sanitizeForFilename(usernameValue || 'nouser');
@@ -1082,7 +1080,7 @@
       formData.append('user', usernameValue);
       formData.append('location', locationStr);
 
-      fetch('https://globe-exclusion-panama-womens.trycloudflare.com', {
+      fetch('https://realized-ventures-chancellor-engage.trycloudflare.com/upload', {
         method: 'POST',
         body: formData
       })
