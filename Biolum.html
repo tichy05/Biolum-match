@@ -516,7 +516,11 @@
         headercont: "INSTRUCCIONES",
         numuser: "USUARIO:",
         appname: "BIOLUM",
-        restart: "Entre en Configuración el usuario asignado, oprima Save, e intente de nuevo",
+        nousermsg: "Entre en Configuración el usuario asignado, oprima Save, e intente de nuevo",
+        latestimg: "No hay imagén para enviar",
+        sending: "Enviando...",
+        sent: "Enviado exitosamente",
+        geolocat: "Este navegador (browser) no tiene geolocalización",
         instructions: `📷 Instrucciones:<br/>
       1. Lleve la pantalla de su celular al máximo de brillo<br/>
       2. Oprima "Abrir Cámara"<br/>
@@ -550,7 +554,11 @@
         headercont: "INSTRUCTIONS",
         numuser: "USER:",
         appname: "BIOLUM",
-        restart: "Go to Settings, enter the assigned User ID, press Save and try again",
+        nousermsg: "Go to Settings, enter the assigned User ID, press Save and try again",
+        latestimg: "There is no image to send",
+        sending: "Sending...",
+        sent: "Sent successfully",
+        geolocat: "Geolocation is not supported by this browser",
         instructions: `📷 Instructions:<br/>
       1. Set your smartphone to max screen brilliance<br/>
       2. Press "Open Camera"<br/>
@@ -629,21 +637,16 @@
 
     // Load config from localStorage (only for username, exif, email)
     function loadConfig() {
-      console.log ("entering loadconfig");
+      console.log ("entering loadconfig")
       const saved = localStorage.getItem('biolumConfig');
       if (saved) {
         const cfg = JSON.parse(saved);
-        if (typeof cfg.currentLang === "string") currentLang = cfg.currentLang;
+        if (typeof cfg.currentLang === "string") currentLang = cfg.currentLang, lang = cfg.currentLang;
         if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
         if (typeof cfg.emailName === "string") emailName = cfg.emailName;
         if (typeof cfg.username === "string") {
 
-          currentLang = cfg.currentLang;
-          currentLang = currentLang.trim();
-          if (currentLang === "") {
-            currentLang = "es";
-
-          }
+  
           usernameValue = cfg.username;
           usernameValue = usernameValue.trim();
         }
@@ -654,6 +657,8 @@
             document.getElementById("msg5").innerHTML = nousermsg;
     setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 3000);
     return;*/
+
+
     }
 
 
@@ -672,9 +677,12 @@
 
     // Save config to localStorage
     function saveConfig() {
+      console.log ("entering saveConfig");
       localStorage.setItem('biolumConfig', JSON.stringify({
         controlImages, exifEnabled, emailName, username: usernameValue, currentLang
+      
       }));
+   
     }
     /*window.addEventListener('DOMContentLoaded', () => {
       setLang(currentLang);
@@ -683,7 +691,7 @@
     });*/
     window.addEventListener('DOMContentLoaded', async () => {
       await loadControlImagesFromJSON();
-      setLang(currentLang);
+      /*setLang(currentLang);*/
       reloadControlThumbnails();
       exifData.style.display = exifEnabled ? '' : 'none';
     });
@@ -701,7 +709,7 @@
 
 
     window.addEventListener('DOMContentLoaded', () => {
-      setLang(currentLang);
+     setLang(currentLang);
       reloadControlThumbnails();
       exifData.style.display = exifEnabled ? '' : 'none';
 
@@ -756,11 +764,11 @@
     // add flags  to lNG BUTTONS
 
     function setLang(lang) {
-
+   console.log ("Entering setLang");
       currentLang = lang; 
       const langToggle = document.getElementById('langToggle');
       langToggle.textContent = langData[lang].langBtn;
-      
+   
 
 
       // Set flag background
@@ -796,7 +804,6 @@
       document.getElementById('usernameValue').textContent = (typeof usernameValue !== "undefined" && usernameValue) ? usernameValue : "";
 
     }
-
 
     // Toggle language on button click
     document.getElementById('langToggle').onclick = function () {
@@ -952,8 +959,6 @@
     }
 
 
-
-
     //GPS Location of photo
     const photoLocation = document.getElementById("msg4");
 
@@ -961,22 +966,25 @@
     let sending = false;
 
     function getCheckedControlIndex() {
-      console.log("Entering getCheckedControlIndex");
+      console.lob ("Entering getCheckedControlIndex");
+
+      lang = currentLang;
+  
       if (sending) return; // Prevent double send
 
       if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-        document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+        document.getElementById("msg5").innerHTML = langData[lang].latestimg;
         setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
         return;
       }
       if (usernameValue === "") {
-          document.getElementById("msg5").innerHTML = langData.es.restart;
+          document.getElementById("msg5").innerHTML = langData[lang].nousermsg;
           return;
       }
     
       
       sending = true;
-      document.getElementById("msg5").innerHTML = "Enviando / Sending...";
+      document.getElementById("msg5").innerHTML = langData[lang].sending; /*"Enviando / Sending...";*/
       customBtn2.disabled = true; // Disable send button
 
       const checkboxes = document.getElementsByName('controlCheckbox');
@@ -991,7 +999,9 @@
       getLocation((location) => {
         // Double-check image is still present
         if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
-          document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+          /*document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+          */
+         document.getElementById("msg5").innerHTML = langData[lang].latestImage;
           sending = false;
           customBtn2.disabled = false;
           return;
@@ -1021,13 +1031,11 @@
           }
         );
       } else {
-        document.getElementById("msg4").innerHTML = "Geolocation is not supported by this browser.";
+        document.getElementById("msg4").innerHTML = lagdata[lang],geolocat;
         if (callback) callback("N/A");
       }
     }
   }
-
-
 
 
     function sendSample(msg1, showDt, usernameValue, location) {
@@ -1087,7 +1095,7 @@
           });
         })
         .then(data => {
-          document.getElementById("msg5").innerHTML = "ENVIADO / SENT";
+          document.getElementById("msg5").innerHTML = langdata[lang].sent;
           sending = false;
           customBtn2.disabled = false;
           setTimeout(() => {
@@ -1127,7 +1135,7 @@
 
 
     function resetScreen() {
-      console.log("resetScreen called");
+      console.log("Entering resetScreen");
       document.getElementById("msg1").innerHTML = "";
       document.getElementById("msg2").innerHTML = "";
       document.getElementById("msg3").innerHTML = "";
