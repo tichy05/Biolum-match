@@ -1,0 +1,58 @@
+Moon phase data request
+Moon phase data request
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moon & Marine Data Fetch</title>
+</head>
+<body>
+  <pre id="output">Loading...</pre>
+
+<script>
+// Coordinates for Bahia Mosquito, Vieques, Puerto Rico
+const LAT = 18.16;
+const LON = -65.38;
+
+// Replace with your IPGeolocation Astronomy API key
+const ASTRO_API_KEY = 'YOUR_ASTRO_API_KEY_HERE';
+
+// No API key required for Open-Meteo Marine
+async function fetchData() {
+  try {
+    // 1. Moon phase & illumination
+    const astroUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${ASTRO_API_KEY}&lat=${LAT}&long=${LON}`;
+    const astroResp = await fetch(astroUrl);
+    if (!astroResp.ok) throw new Error('Astronomy API error');
+    const astroData = await astroResp.json();
+    
+    const moonPhase = astroData.moon_phase;           // e.g. "WAXING_CRESCENT"
+    const illumPercent = astroData.moon_illumination; // e.g. "42.1"
+
+    // 2. Marine weather: current wind & precipitation
+    // We'll use Open-Meteo: request current wind speed and precipitation
+    const marineUrl = `https://api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&current=wind_speed,precipitation&timezone=auto`;
+    const marineResp = await fetch(marineUrl);
+    if (!marineResp.ok) throw new Error('Marine API error');
+    const marineData = await marineResp.json();
+
+    const wind = marineData.current?.wind_speed ?? null;             // e.g. in m/s
+    const precip = marineData.current?.precipitation ?? 0;            // mm
+
+    // Decide precipitation description
+    const rainDesc = precip >= 2 ? 'Heavy rain' : (precip > 0 ? 'Light rain' : 'No rain');
+    
+    // Compose a line of CSV-style data
+    const line = `"Bahia Mosquito, Vieques, PUERTO RICO","${moonPhase}",${illumPercent}%,"${wind} m/s","${rainDesc}"`;
+    document.getElementById('output').textContent = line;
+
+  } catch (err) {
+    document.getElementById('output').textContent = 'Error: ' + err.message;
+    console.error(err);
+  }
+}
+
+fetchData();
+</script>
+</body>
+</html>
