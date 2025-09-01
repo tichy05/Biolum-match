@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="icon" type="image/png" href="https://tichy05.github.io/Biolum-match/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://tichy05.github.io/Biolum-match/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152"
+    href="https://tichy05.github.io/Biolum-match/apple-touch-icon-152x152.png">
+  <title>Biolum</title>
+  <!--Biolum V1.0 (v40 7/9/2025) JCFP -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      font-weight: 100;
+      background-color: #222;
+      color: #c2bfbf;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #header {
+      width: 100vw;
+      min-height: 36px;
+      height: 4vh;
+      background-color: rgba(5, 128, 143, 255);
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-right: 2em;
+      box-sizing: border-box;
+      font-size: 1.2em;
+      flex-wrap: wrap;
+    }
+
+    #mainContent {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 7vh);
+      min-height: 0;
+      min-width: 0;
+      width: 100vw;
+      box-sizing: border-box;
+    }
+
+    #controlPanel {
+      width: 320px;
+      min-width: 220px;
+      max-width: 400px;
+      background-color: #222;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      font-weight: 100;
+      font-size: 14pt;
+      box-sizing: border-box;
+      border-right: 1px solid #333;
+    }
+
+    #comparisonPanel {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 32px;
+      background-color: #222;
+      padding: 40px 0 0 0;
+      min-width: 0;
+      min-height: 0;
+      box-sizing: border-box;
+    }
+
+    #imageContainer {
+      position: relative;
+      flex: 1 1 0;
+      margin-top: 5px;
+      margin-left: 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 210px;
+      min-height: 300px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 210px 300px;
+      background-image: URL(https://tichy05.github.io/Biolum-match/VCHTlogo.jpg);
+    }
+
+    #latestImage[src=""] {
+      display: none;
+    }
+
+    #latestImage:not([src=""]) {
+      display: block;
+    }
+
+    #controlsContainer {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 12px;
+      min-width: 210px;
+      max-width: 210px;
+      margin-left: 24px;
+      font-size: 12pt;
+      color: #c2bfbf;
+      box-sizing: border-box;
+
+    }
+
+    .thumb {
+      width: 80%;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .thumb:hover {
+      border-color: rgba(5, 128, 143, 255);
+    }
+
+    #latestImage {
+      max-width: 100%;
+      max-height: 65vh;
+      border: 2px solid rgba(5, 128, 143, 255);
+      background: #111;
+    }
+
+    #customBtn,
+    #customBtn2,
+    #customBtn3 {
+      max-width: 200px;
+      font-size: 14pt;
+      max-height: 50px;
+      border: 2px solid rgba(5, 128, 143, 255);
+      color: #c2bfbf;
+      ;
+      padding: 10px;
+      border-radius: 24px;
+      background-color: #222;
+      margin-top: 2px;
+    }
+
+    #customBtn2,
+    #customBtn3 {
+      margin-top: 25px;
+    }
+
+    #customBtn:hover,
+    #customBtn2:hover,
+    #customBtn3:hover {
+      border-color: #888;
+    }
+
+    #customBtn2:hover,
+    #customBtn3:hover,
+    after {
+      border-color: #888;
+    }
+
+    #instructions {
+      font-size: 14pt;
+      margin: 20px 10px;
+      text-align: left;
+      background-color: #222;
+      padding: 10px;
+      border-radius: 10px;
+      color: #c2bfbf;
+      font-weight: 100;
+    }
+
+    #exifData {
+      margin-top: 10px;
+      font-size: 12pt;
+      color: #0f0;
+    }
+
+    #langToggle {
+      background-repeat: no-repeat;
+      background-size: 40px 20px;
+      background-position: 0px 8px;
+      margin-left: 0;
+      padding-right: 2em;
+
+    }
+
+    #configForm {
+      width: 100%;
+      max-width: 360px;
+      min-width: 220px;
+      box-sizing: border-box;
+    }
+
+    #configForm input[type="text"],
+    #configForm input[type="email"] {
+      width: 95%;
+      font-size: 10pt;
+      padding: 8px 10px;
+      margin: 6px 0 12px 0;
+      border-radius: 8px;
+      border: 1px solid #888;
+      background: #333;
+      color: #fff;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+
+    #configForm input[type="text"]:focus,
+    #configForm input[type="email"]:focus {
+      border: 2px solid #f44;
+      outline: none;
+      background: #222;
+    }
+
+    #configForm label {
+      font-size: 12pt;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    #configForm button {
+      font-size: 12pt;
+      padding: 8px 24px;
+      margin-right: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #444;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #configForm button:hover {
+      background: rgba(5, 128, 143, 255);
+    }
+
+    #configModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 95vw;
+      max-width: 400px;
+      min-width: 260px;
+      height: 90vh;
+      max-height: 600px;
+      min-height: 350px;
+      background: #000a;
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      transform: translate(-50%, -50%);
+      border-radius: 16px;
+      flex-direction: column;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .open {
+      font-size: 32px;
+      font-weight: 100;
+      color: #222;
+      float: none;
+      margin-left: 4px;
+      display: block;
+      cursor: pointer;
+      width: 18px;
+      padding-right: 2em;
+    }
+
+
+    .showInstr {
+      font-size: 12pt;
+      font-weight: 400;
+      color: #222;
+      float: none;
+      margin-left: 4px;
+      display: block;
+      cursor: pointer;
+      padding-right: 2em;
+    }
+
+    .username {
+      font-size: 12pt;
+      font-weight: 400;
+      color: #222;
+      float: none;
+      margin-left: 5px;
+      display: block;
+      padding-right: 2em;
+
+    }
+
+
+    @media (max-width: 600px) {
+      #header {
+        font-size: 1.2em;
+        flex-direction: column;
+        height: auto;
+        min-height: 48px;
+        padding: 4px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .username,
+      .showInstr {
+        margin-left: 0 !important;
+        font-size: 1em !important;
+        float: none !important;
+        display: block !important;
+        margin-top: 0px;
+      }
+
+      #langToggle {
+        margin-left: 0 !important;
+        margin-top: 0px;
+        align-self: flex-start;
+      }
+
+      #imageContainer {
+        min-width: 190px;
+        min-height: 280px;
+        background-size: 190px 280px;
+      }
+
+    }
+
+    #rotateWarning {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000000cc;
+      color: #fff;
+      font-size: 24px;
+      text-align: center;
+      padding-top: 10vh;
+      z-index: 99999;
+      pointer-events: all;
+      /* background-color: transparent;*/
+
+
+
+    }
+  </style>
+</head>
+
+<body>
+  <div id="rotateWarning">Por favor, gire su dispositivo a modo horizontal (Please set your device to landscape)</div>
+  <div id="header">
+    <span id="Config" class="open" onclick="openConfig()">&#x2699;</span>
+    <button id="langToggle" style="align-self: normal; 
+      margin-top: 0px;
+      margin-left: 0px;
+      max-width: 100px;
+      max-height: 45px;
+      border: 0px solid rgba(5,128,143,255);
+      color: #222;
+      padding:0px 0px 0px 45px;
+      border-radius: 0px; 
+      font-size: 12pt;
+      padding-right: 2em;
+      background-color: transparent"></button>
+
+    <span id="showInstr" class="showInstr" onclick="showInstructions()">INSTRUCCIONES</span>
+    <span id="appname" class="username" style="font-weight: 800"></span>
+    <span id="username" class="username"><span id="numuserLabel"></span> <span id="usernameValue"></span></span>
+
+    <!--reserved space in header for future data/buttons-->
+
+    <span id="dateToday" class="username"></span>
+  </div>
+  <div id="mainContent">
+    <div id="controlPanel">
+      <H3>Imagenes de Control</H3>
+      <div id="instructions"></div>
+      <!-- Thumbnails will be inserted here by JS -->
+    </div>
+    <div id="comparisonPanel">
+      <div id="imageContainer">
+        <img id="latestImage" src="" alt="">
+      </div>
+      <div id="controlsContainer">
+        <button id="customBtn"></button><br>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none">
+        <span id="fileLabel" style="display:none"></span>
+        <span id="msg1"></span>
+        <span id="msg2"></span>
+        <span id="msg3"></span>
+        <span id="msg4"></span>
+        <span id="msg5" style="color: yellow "></span>
+        <div id="exifData"></div>
+        <button id="customBtn2" type="button" onclick="getCheckedControlIndex()">Send</button>
+        <button id="customBtn3" type="button" onclick="resetScreen()">Reset</button>
+      </div>
+    </div>
+  </div>
+  <div id="configModal">
+    <form id="configForm" style="background:#222; font-size: 10pt; color:white; padding:12px; border-radius:16px;">
+      <h2>Config</h2>
+      <label>Control Image URLs or file names:<br>
+        <input type="text" name="img0" placeholder="URL or file for IB # 1">
+        <input type="text" name="img1" placeholder="URL or file for IB # 2">
+        <input type="text" name="img2" placeholder="URL or file for IB # 3">
+        <input type="text" name="img3" placeholder="URL or file for IB # 4">
+        <input type="text" name="img4" placeholder="URL or file for IB # 5">
+      </label><br>
+      <label>
+        User: <input type="text" name="username" placeholder="User Id">
+      </label><br>
+      <label>
+        Language: <input type="text" name="currentLang" placeholder="en / es">
+      </label><br>
+      <button type="submit">Save</button>
+      <button type="button" onclick="closeConfig()">Cancel</button>
+
+      <label><br><br>
+        Email to send data to: <input type="email" name="email" disabled placeholder="NOT USED">
+      </label><br>
+
+      <label>
+        Show EXIF (image details - future use):
+        <input type="checkbox" name="exifOn" disabled>
+      </label><br>
+
+    </form>
+  </div>
+
+  <script>
+
+    //get system date and time into header and into file to send
+    const dt = new Date();
+    let showDt = (dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate() )
+    let Th = (dt.getHours())
+    if (dt.getHours() < 10) {
+      (Th = "0" + Th)
+      showDt = (showDt + "  " + Th)
+    } else {
+      showDt = (showDt + "  " + Th)
+    }
+
+
+    let Tm = (dt.getMinutes())
+    if (dt.getMinutes() < 10) {
+      (Tm = "0" + Tm)
+      showDt = (showDt + ":" + Tm)
+    } else {
+      showDt = (showDt + ":" + Tm)
+    }
+
+    let Ts = (dt.getSeconds())
+    if (dt.getSeconds() < 10) {
+      (Ts = "0" + Ts)
+      showDt = (showDt + ":" + Tm)
+    } else {
+      showDt = (showDt + ":" + Ts)
+    }
+
+
+    document.getElementById("dateToday").innerHTML = showDt;
+
+
+
+    // Up to 5 control images, can add more; if some do not exist, no issues
+
+    // Store config variables
+    /*let controlImages = [
+      'https://tichy05.github.io/Biolum-match/IB 1.jpg', 
+      'https://tichy05.github.io/Biolum-match/IB 2.jpg', 
+      'https://tichy05.github.io/Biolum-match/IB 3.jpg',
+      'https://tichy05.github.io/Biolum-match/IB 4.jpg', 
+      'https://tichy05.github.io/Biolum-match/IB 5.jpg' 
+    ];*/
+    let controlImages = [];
+    let exifEnabled = false;
+    let emailName = "";
+    let usernameValue = "";
+    let appname = "";
+    let nousermsg = "";
+    let latmoon = "";
+    let lngmoon = "";
+    let moonPhase = "";
+    let moonIllum = "";
+    let moonphase = "";
+    let moonillum = "";
+
+    // Language data
+
+    const langData = {
+      es: {
+        langBtn: "EN",
+        title: "Imagenes de Control",
+        headercont: "INSTRUCCIONES",
+        numuser: "USUARIO:",
+        appname: "BIOLUM",
+        nousermsg: "Entre en Configuración el usuario asignado, oprima Save, e intente de nuevo",
+        latestimg: "No hay imagén para enviar",
+        sending: "Enviando...",
+        sent: "Enviado exitosamente",
+        geolocat: "Este navegador (browser) no tiene geolocalización",
+        errorsending: "ERROR ENVIANDO DATA",
+        servernotav: "Servidor no disponible; favor reintentar en unos momentos.",
+        instructions: `📷 Instrucciones:<br/>
+      1. Lleve la pantalla de su celular al máximo de brillo<br/>
+      2. Oprima "Abrir Cámara"<br/>
+      3. Verifique el "flash" este apagado<br/>
+      4. Usted debe estar lo mas estable posible<br/>
+      5. Ponga la cámara a unos tres (3) pies (91,44 cm) de la superficie 
+      del agua<br/>
+      6. Enfoque la cámara y tome la foto<br/>
+      7. Si la foto salió bien, presione "Use", si no, "Retake"<br/>
+      8. Va a comparar el brillo de la muestra (a la derecha), con las imagenes de control a la izquierda.  Presionando sobre las imagenes control, se sobrepondrán a la muestra por un segundo<br/>
+      9. Una vez escoja el control mas aproximado en brillantez, marcará el cuadro en blanco debajo de su nombre<br/>
+      10. Presione "Enviar Muestra"<br/>
+      11. Si no marca ningún cuadro antes de enviar, se enviará la muestra sin comparación<br/>
+      Gracias por contribuir con este proyecto`,
+        chooseFile: "Abrir Cámara",
+        sendSample: "Enviar Muestra",
+        noFile: "",
+        rotate: "Por favor, gire su dispositivo a modo horizontal (landscape)",
+        levels: idx => `IB # ${idx + 1}`,
+        exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Tiempo de exposición: 1/${exposure || ''} ms<br/>
+      f📷   Número f: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ Balance blancos: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Longitud focal: ${focus || 'N/A'}
+    `
+      },
+      en: {
+        langBtn: "ES",
+        title: "Control Images",
+        headercont: "INSTRUCTIONS",
+        numuser: "USER:",
+        appname: "BIOLUM",
+        nousermsg: "Go to Settings, enter the assigned User ID, press Save and try again",
+        latestimg: "There is no image to send",
+        sending: "Sending...",
+        sent: "Sent successfully",
+        geolocat: "Geolocation is not supported by this browser",
+        errorsending: "ERROR SENDING DATA",
+        servernotav: "Server is not available. Please try again later.",
+        instructions: `📷 Instructions:<br/>
+      1. Set your smartphone to max screen brilliance<br/>
+      2. Press "Open Camera"<br/>
+      3. Verify the flash is off<br/>
+      4. You must be as stabilized as possible<br/>
+      5. Hold the camera about three (3) feet (91,44 cm) from the water's surface<br/>
+      6. Focus the camera and take the picture<br/>
+      7. If the image looks ok, press "Use", else "Retake"<br/>
+      8. Try to match the brilliance of the sample taken, with the control images on your left.  You can press on the control images, they will cover the sample for a second, and it's easier to see the difference<br/>
+      9. Select the most aproximate control image in terms of brilliance, and mark the white square below their name<br/>
+      10. Press "Send Sample"<br/>
+      11. If no control image is marked, the image will be sent unmatched
+      Thanks for your contribution to this project`,
+        chooseFile: "Open Camera",
+        sendSample: "Send Sample",
+        noFile: "",
+        rotate: "Please rotate your device to landscape mode",
+        levels: idx => `IB # ${idx + 1}`,
+        exif: (iso, exposure, fNumber, wb, focus) => `
+      📷 ISO: ${iso || 'N/A'}<br/>
+      🕒 Exposure time: 1/${exposure || ''} ms<br/>
+      f📷   f-number: ${fNumber ? fNumber.toFixed(1) : 'N/A'}<br/>
+      ⚪ White balance: ${wb === 0 ? 'Auto' : wb === 1 ? 'Manual' : 'N/A'}<br/>
+      🔍 Focal length: ${focus || 'N/A'}
+    `
+      }
+    };
+
+    let currentLang = 'es';
+    let instrToggle = 'no';
+
+
+
+    // Load control images from JSON file (shared for all users)
+    async function loadControlImagesFromJSON() {
+      console.log("entering loadcontrolImagesfromjson");
+      try {
+        const res = await fetch('https://tichy05.github.io/Biolum-match/controlImages.json');
+        const data = await res.json();
+        controlImages = (data.controlImages);
+
+
+
+        /* // If your images are in the same folder, just use the names
+        controlImages = (data.controlImages || []).map(name =>
+          name.startsWith('http') ? name : name
+          ); */
+
+
+      } catch (e) {
+        // fallback to default if fetch fails
+        controlImages = [
+          'https://tichy05.github.io/Biolum-match/IB_1.jpg',
+          'https://tichy05.github.io/Biolum-match/IB_2.jpg',
+          'https://tichy05.github.io/Biolum-match/IB_3.jpg',
+          'https://tichy05.github.io/Biolum-match/IB_4.jpg',
+          'https://tichy05.github.io/Biolum-match/IB_5.jpg'
+        ];
+      }
+    }
+   
+
+    // Load config from localStorage (only for username, exif, email)
+    function loadConfig() {
+      console.log("entering loadconfig")
+      const saved = localStorage.getItem('biolumConfig');
+      if (saved) {
+        const cfg = JSON.parse(saved);
+        if (typeof cfg.currentLang === "string") currentLang = cfg.currentLang, lang = cfg.currentLang;
+        if (typeof cfg.exifEnabled === "boolean") exifEnabled = cfg.exifEnabled;
+        if (typeof cfg.emailName === "string") emailName = cfg.emailName;
+        if (typeof cfg.username === "string") {
+
+
+          usernameValue = cfg.username;
+          usernameValue = usernameValue.trim();
+        }
+      }
+     
+
+    }
+
+    loadConfig();
+
+
+    // close config form
+    function closeConfig() {
+      console.log("entering closeconfig");
+      document.getElementById('configModal').style.display = 'none';
+      document.body.style.overflow = ''; // Restore scroll
+    }
+
+
+    // Save config to localStorage
+    function saveConfig() {
+      console.log("entering saveConfig");
+      localStorage.setItem('biolumConfig', JSON.stringify({
+        controlImages, exifEnabled, emailName, username: usernameValue, currentLang
+
+      }));
+
+    }
+    /*window.addEventListener('DOMContentLoaded', () => {
+      setLang(currentLang);
+      reloadControlThumbnails();
+      exifData.style.display = exifEnabled ? '' : 'none';
+    });*/
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadControlImagesFromJSON();
+      /*setLang(currentLang);*/
+      reloadControlThumbnails();
+      exifData.style.display = exifEnabled ? '' : 'none';
+    });
+
+    const controlPanel = document.getElementById('controlPanel');
+    const comparisonPanel = document.getElementById('comparisonPanel');
+    window.fileInput = document.getElementById('fileInput');
+    const customBtn2 = document.getElementById('customBtn2');
+    const customBtn3 = document.getElementById('customBtn3');
+    const fileLabel = document.getElementById('fileLabel');
+    const latestImage = document.getElementById('latestImage');
+    const exifData = document.getElementById('exifData');
+    const currentExif = 'none';
+    /*const username = document.getElementById('username');*/
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setLang(currentLang);
+      reloadControlThumbnails();
+      exifData.style.display = exifEnabled ? '' : 'none';
+
+    });
+
+
+
+    // Select input file, photo or take photo depending on device
+
+    customBtn.onclick = () => window.fileInput.click();
+
+
+    function checkOrientation() {
+      console.log("entering checkorientation");
+      const warning = document.getElementById('rotateWarning');
+      const configModal = document.getElementById('configModal');
+      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+
+      warning.style.display = isLandscape ? 'none' : 'block';
+      document.body.style.overflow = isLandscape ? '' : 'hidden';
+      if (configModal.style.display !== 'none') {
+        configModal.style.width = '95vw';
+        configModal.style.maxWidth = '400px';
+        configModal.style.minWidth = '260px';
+        configModal.style.height = '90vh';
+        configModal.style.maxHeight = '600px';
+        configModal.style.minHeight = '350px';
+        configModal.style.overflowY = 'auto';
+
+        if (isLandscape) {
+          configModal.style.top = '0';
+          configModal.style.left = '50%';
+          configModal.style.transform = 'translateX(-50%)';
+          configModal.style.alignItems = 'flex-start';
+          configModal.style.justifyContent = 'flex-start';
+        } else {
+          configModal.style.top = '50%';
+          configModal.style.left = '50%';
+          configModal.style.transform = 'translate(-50%, -50%)';
+          configModal.style.alignItems = 'center';
+          configModal.style.justifyContent = 'center';
+        }
+      }
+    }
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('load', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 300);
+    });
+
+
+    // add flags  to lNG BUTTONS
+
+    function setLang(lang) {
+      console.log("Entering setLang");
+      currentLang = lang;
+      const langToggle = document.getElementById('langToggle');
+      langToggle.textContent = langData[lang].langBtn;
+
+
+
+      // Set flag background
+      if (lang === 'es') {
+        langToggle.style.backgroundImage = "url('https://tichy05.github.io/Biolum-match/Flag_of_the_United_States.svg')";
+      } else {
+        langToggle.style.backgroundImage = "url('https://tichy05.github.io/Biolum-match/Flag_of_Puerto_Rico.svg')";
+      }
+      if (instrToggle === 'yes') {
+        document.getElementById('instructions').innerHTML = langData[lang].instructions;
+      } else {
+        document.getElementById('instructions').innerHTML = "";
+      }
+
+
+
+      document.querySelector('#controlPanel H3').textContent = langData[lang].title;
+      document.querySelector('#showInstr').textContent = langData[lang].headercont;
+      document.getElementById('appname').textContent = langData[lang].appname;
+      document.getElementById('customBtn').textContent = langData[lang].chooseFile;
+      document.getElementById('customBtn2').textContent = langData[lang].sendSample;
+      document.getElementById('fileLabel').textContent = currentFileName || langData[lang].noFile;
+      document.getElementById('rotateWarning').textContent = langData[lang].rotate;
+
+      reloadControlThumbnails(); // <-- Rebuild thumbnails with correct labels
+
+      if (lastExif) {
+        exifData.innerHTML = langData[lang].exif(
+          lastExif.iso, lastExif.exposure, lastExif.fNumber, lastExif.wb, lastExif.focus
+        );
+      }
+      document.getElementById('numuserLabel').textContent = langData[lang].numuser;
+      document.getElementById('usernameValue').textContent = (typeof usernameValue !== "undefined" && usernameValue) ? usernameValue : "";
+
+    }
+
+    // Toggle language on button click
+    document.getElementById('langToggle').onclick = function () {
+      setLang(currentLang === 'es' ? 'en' : 'es');
+    };
+
+    // Initial language setup
+    window.addEventListener('DOMContentLoaded', () => setLang(currentLang));
+
+
+    // Update EXIF display to use language
+
+
+    let lastExif = null; // Store last EXIF data
+    let currentFileName = ""; // Store current file name
+
+
+    window.fileInput.addEventListener('change', handleFileInputChange);
+
+    function showInstructions() {
+      console.log("entering showinstructions");
+      if (instrToggle === "yes") {
+        document.getElementById('instructions').innerHTML = "";
+        instrToggle = "no";
+      } else {
+        document.getElementById('instructions').innerHTML = langData[currentLang].instructions;
+        instrToggle = "yes";
+      }
+    }
+
+
+    // CONFIG MODAL ****
+
+    // Show config modal
+
+    function openConfig() {
+      console.log("entering openconfig");
+      const form = document.getElementById('configForm');
+      for (let i = 0; i < 5; i++) {
+        form['img' + i].value = controlImages[i] || '';
+      }
+      form.currentLang.value = currentLang;
+      form.exifOn.checked = exifEnabled;
+      form.email.value = emailName || '';
+      form.username.value = usernameValue || ''; // <-- This line ensures the username persists
+      document.getElementById('configModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Block background scroll
+    }
+
+
+    // Handle config form submit
+    document.getElementById('configForm').onsubmit = function (e) {
+      e.preventDefault();
+      for (let i = 0; i < 5; i++) {
+        controlImages[i] = this['img' + i].value || '';
+      }
+      exifEnabled = this.exifOn.checked;
+      emailName = this.email.value;
+      usernameValue = this.username.value;
+      currentLang = this.currentLang.value;
+      saveConfig();
+      closeConfig();
+      reloadControlThumbnails();
+      exifData.style.display = exifEnabled ? '' : 'none';
+      setLang(currentLang); // Update username display
+    };
+
+
+
+    function reloadControlThumbnails() {
+      console.log("entering reloadcontrolthumbnails");
+      // Remove all children except the H3 and instructions
+      const keep = new Set(['H3', 'instructions']);
+      let i = 0;
+      while (i < controlPanel.children.length) {
+        const child = controlPanel.children[i];
+        if (!keep.has(child.tagName) && child.id !== 'instructions') {
+          controlPanel.removeChild(child);
+        } else {
+          i++;
+        }
+      }
+
+      controlImages.forEach((src, idx) => {
+        if (!src) return; // Skip if no image URL
+
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.alignItems = 'center';
+        container.style.marginBottom = '15px';
+        container.style.fontSize = '14pt';
+
+        // Checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'controlCheckbox';
+        checkbox.className = 'single-selection-checkbox';
+        checkbox.value = idx;
+        checkbox.style.marginRight = '8px';
+
+        // Label
+        const label = document.createElement('span');
+        label.textContent = `IB # ${idx + 1}`;
+        label.style.marginRight = '8px';
+
+        // Image
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = 'thumb';
+        img.alt = ""; // No alt text
+        img.onclick = () => {
+          const originalSrc = latestImage.src;
+          latestImage.src = src;
+
+          let tempLabel = document.createElement('span');
+          tempLabel.textContent = `IB # ${idx + 1}`;
+          tempLabel.style.display = 'block';
+          tempLabel.style.marginTop = '10px';
+          tempLabel.style.fontSize = '18pt';
+          tempLabel.id = 'tempLabel';
+
+          const oldLabel = document.getElementById('tempLabel');
+          if (oldLabel) oldLabel.remove();
+
+          controlsContainer.appendChild(tempLabel);
+
+          setTimeout(() => {
+            latestImage.src = originalSrc;
+            tempLabel.remove();
+          }, 1000);
+        };
+
+        // Hide label and checkbox if image fails to load
+        img.onerror = () => {
+          container.style.display = 'none';
+        };
+
+        container.appendChild(img);
+        container.appendChild(label);
+        container.appendChild(checkbox);
+
+        checkbox.addEventListener('change', function () {
+          if (this.checked) {
+            document.querySelectorAll('input[name="controlCheckbox"]').forEach(cb => {
+              if (cb !== this) cb.checked = false;
+            });
+          }
+        });
+
+        controlPanel.appendChild(container);
+      });
+    }
+
+
+    //GPS Location of photo
+    const photoLocation = document.getElementById("msg4");
+
+
+    let sending = false;
+
+    function getCheckedControlIndex() {
+      console.log("Entering getCheckedControlIndex");
+
+      lang = currentLang;
+
+      if (sending) return; // Prevent double send
+
+      if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
+        document.getElementById("msg5").innerHTML = langData[lang].latestimg;
+        setTimeout(() => { document.getElementById("msg5").innerHTML = ""; }, 5000);
+        return;
+      }
+      if (usernameValue === "") {
+        document.getElementById("msg5").innerHTML = langData[lang].nousermsg;
+        return;
+      }
+
+
+      sending = true;
+      document.getElementById("msg5").innerHTML = langData[lang].sending; /*"Enviando / Sending...";*/
+      customBtn2.disabled = true; // Disable send button
+
+      const checkboxes = document.getElementsByName('controlCheckbox');
+      let msg1 = "NoCom";
+      for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked) {
+          msg1 = "IB #" + (parseInt(checkboxes[i].value, 10) + 1);
+          break;
+        }
+      }
+
+    
+
+      getLocation((location) => {
+        // Double-check image is still present
+        if (!latestImage.src || latestImage.src === window.location.href || latestImage.src === "") {
+          /*document.getElementById("msg5").innerHTML = "Debe cargar una imagen antes de enviar / Please load an image before sending";
+          */
+          document.getElementById("msg5").innerHTML = langData[lang].latestImage;
+          sending = false;
+          customBtn2.disabled = false;
+          return;
+        }
+        sendSample(msg1, null, usernameValue, location, moonphase, moonillum);
+      });
+
+
+      // Get GPS location and limit decimal places because its used in filename
+      // 8 decimal places is millimeter accuracy
+      function getLocation(callback) {
+        console.log("Entering getLocation");
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              // Limit latitude and longitude to 8 decimal places
+              const lat = position.coords.latitude.toFixed(8);
+              let latmoon = lat;
+              const lng = position.coords.longitude.toFixed(8);
+              let lngmoon = lng;
+              const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
+              document.getElementById("msg4").innerHTML = loc;
+              if (callback) callback(loc);
+
+            },
+            function () {
+              document.getElementById("msg4").innerHTML = "N/A";
+              if (callback) callback("N/A");
+            }
+          );
+        } else {
+          document.getElementById("msg4").innerHTML = lagdata[lang], geolocat;
+          if (callback) callback("N/A");
+        }
+      }
+      getMoonphase();
+    }
+
+
+    function sendSample(msg1, showDt, usernameValue, location, moonphase, moonillum) {
+      console.log("Entering sendSample");
+      // Always get the current date/time when sending
+      const dt = new Date();
+      let showDtNow =  (dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate() )
+      let Th = dt.getHours();
+      if (Th < 10) Th = "0" + Th;
+      showDtNow = showDtNow + "  " + Th;
+      let Tm = dt.getMinutes();
+      if (Tm < 10) Tm = "0" + Tm;
+      showDtNow = showDtNow + ":" + Tm;
+      let Ts = dt.getSeconds();
+      if (Ts < 10) Ts = "0" + Ts;
+      showDtNow = showDtNow + ":" + Ts;
+      // Use location from argument, fallback to msg4 if missing
+      let locationStr = location || document.getElementById("msg4").innerHTML;
+
+      document.getElementById("msg1").innerHTML = "Control: " + msg1;
+      document.getElementById("msg2").innerHTML = "Dt/Tm: " + showDtNow;
+      document.getElementById("msg3").innerHTML = "User: " + usernameValue;
+      document.getElementById("msg4").innerHTML = locationStr;
+      // Build FormData and Blob here, every time
+      const formData = new FormData();
+
+      function sanitizeForFilename(str) {
+        return str.replace(/<[^>]*>?/gm, '') // Remove HTML tags
+          .replace(/[^\w.-]+/g, '_'); // Replace non-filename chars with _
+      }
+      let safeDt = showDtNow.replace(/[^\w.-]+/g, '_');
+      
+      const safeControl = sanitizeForFilename(msg1);
+      const safeLocation = sanitizeForFilename(locationStr);
+      const safeUser = sanitizeForFilename(usernameValue || 'nouser');
+      const filename = `Datetime${safeDt}_Control_${safeControl}_User${safeUser}_${safeLocation}.jpg`;
+
+      const blob = dataURLtoBlob(latestImage.src);
+      if (blob) {
+        formData.append('image', blob, filename);
+      }
+      formData.append('control', msg1);
+      formData.append('datetime', showDtNow);
+      formData.append('user', usernameValue);
+      formData.append('location', locationStr);
+      formData.append('moonphase', moonPhase);   // OPTIONAL - activate if you want moonphase for today
+      formData.append('moonillum', moonIllum);   // OPTIONAL - activate if you want moonillum for today
+      console.log("xx",moonPhase,moonphase,moonIllum, moonIllum);
+      // Send data
+
+      /*fetch('http://localhost:3000/upload', {*/
+      fetch('https://lifetime-flickr-twisted-ph.trycloudflare.com', {
+        method: 'POST',
+        body: formData
+      })
+
+        .then(res => {
+          const statusCode = res.status;
+
+          return res.text().then(text => {
+            let data;
+            try {
+              data = text ? JSON.parse(text) : {};
+            } catch {
+              data = {};
+            }
+
+            if (!res.ok) {
+              const error = new Error("HTTP error " + statusCode);
+              error.status = statusCode;
+              error.responseData = data;
+              throw error;
+            }
+
+            return data;
+          });
+        })
+ 
+  .then(data => {
+  if (data.status !== 'ok') {
+    throw new Error('Unexpected server response');
+  }
+
+  // Show success message including CSV and file info
+  const fileMsg = data.filename ? `File: ${data.filename}` : '';
+  document.getElementById("msg5").innerHTML =
+    `<span style='color: green;'>✅ ${data.message}<br>✅ ${fileMsg}</span>`;
+
+  sending = false;
+  customBtn2.disabled = false;
+
+  setTimeout(() => {
+    resetScreen();
+  }, 5000);
+})
+
+
+ 
+.catch(err => { 
+  let errorMessage = langData[lang].errorsending;  
+
+  // Detect no response (server down / network error)
+  if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
+    errorMessage = langData[lang].servernotav;   
+  } else if (err.status) {
+    errorMessage = `Error ${err.status}`;
+  } else if (err.message) {
+    errorMessage = err.message;
+  }
+
+  document.getElementById("msg5").innerHTML =
+    `<span style='color: red; font-weight: 200;'>${errorMessage}</span>`;
+
+  sending = false;
+  customBtn2.disabled = false;
+
+  setTimeout(() => {
+    resetScreen();
+  }, 5000);
+});
+
+
+    }
+
+    // Convert Data URL to Blob and append with filename
+    function dataURLtoBlob(dataurl) {
+      if (!dataurl || typeof dataurl !== "string" || !dataurl.startsWith("data:")) {
+        return null;
+      }
+      const arr = dataurl.split(',');
+      const mimeMatch = arr[0].match(/:(.*?);/);
+      if (!mimeMatch) return null;
+      const mime = mimeMatch[1];
+      const bstr = atob(arr[1]);
+      const n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
+      return new Blob([u8arr], { type: mime });
+    }
+
+
+
+
+    function resetScreen() {
+      console.log("Entering resetScreen");
+      document.getElementById("msg1").innerHTML = "";
+      document.getElementById("msg2").innerHTML = "";
+      document.getElementById("msg3").innerHTML = "";
+      document.getElementById("msg4").innerHTML = "";
+      document.getElementById("msg5").innerHTML = "";
+      latestImage.src = "";
+      latestImage.style.display = "none";
+      fileLabel.textContent = "";
+
+      // Uncheck all control checkboxes
+      const checkboxes = document.getElementsByName('controlCheckbox');
+      for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+      }
+
+      // Replace file input to ensure change event always fires
+      const oldInput = document.getElementById('fileInput');
+      const newInput = oldInput.cloneNode(true);
+      oldInput.parentNode.replaceChild(newInput, oldInput);
+
+      // Update global reference
+      window.fileInput = newInput;
+
+      // Re-attach the main event listener
+      newInput.addEventListener('change', handleFileInputChange);
+
+      // *** FIX: Re-attach the button handler to the new input ***
+      customBtn.onclick = () => window.fileInput.click();
+
+
+
+      // Update global reference to use it elsewhere
+      window.fileInput = newInput;
+
+      // Re-attach the button click handler to use the new input
+      // Re-attach the main event listener
+      newInput.addEventListener('change', handleFileInputChange);
+
+    }
+
+
+    function handleFileInputChange(event) {
+      console.log("entering handlefileinput");
+      const file = event.target.files[0];
+      if (file) {
+        latestImage.style.display = "block";
+        currentFileName = file.name;
+        fileLabel.textContent = currentFileName;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new window.Image();
+          img.onload = function () {
+            let portraitDataUrl = e.target.result;
+            if (img.width > img.height) {
+              // Landscape, rotate to portrait
+              const canvas = document.createElement('canvas');
+              canvas.width = img.height;
+              canvas.height = img.width;
+              const ctx = canvas.getContext('2d');
+              ctx.save();
+              ctx.translate(canvas.width / 2, canvas.height / 2);
+              ctx.rotate(-Math.PI / 2);
+              ctx.drawImage(img, -img.width / 2, -img.height / 2);
+              ctx.restore();
+              portraitDataUrl = canvas.toDataURL('image/jpeg');
+            }
+            latestImage.src = portraitDataUrl;
+            latestImage.style.display = "block";
+            exifData.textContent = "Leyendo datos EXIF...";
+            EXIF.getData(file, function () {
+              const iso = EXIF.getTag(this, 'ISOSpeedRatings');
+              const exposure = (EXIF.getTag(this, 'ExposureTime') * 1000)
+              const fNumber = EXIF.getTag(this, 'FNumber');
+              const wb = EXIF.getTag(this, 'WhiteBalance');
+              const focus = EXIF.getTag(this, 'FocalLength');
+              lastExif = { iso, exposure, fNumber, wb, focus }; // Save for language switching
+              exifData.innerHTML = langData[currentLang].exif(iso, exposure, fNumber, wb, focus);
+            });
+            window.fileInput.value = "";
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        fileLabel.textContent = langData[currentLang].noFile;
+        currentFileName = "";
+        lastExif = null;
+        exifData.innerHTML = "";
+      }
+    }
+
+    
+    // Get moonphase info (OPTIONAl - need to activate)
+    // Replace with your IPGeolocation Astronomy API key
+  async function getMoonphase() {
+    
+    console.log("entering getMoonphase"); 
+    const ASTRO_API_KEY = '8d4787b8e37747bfaa5007348102e347';
+    const astroUrl = `https://api.ipgeolocation.io/astronomy?apiKey=${ASTRO_API_KEY}&lat=${latmoon}&long=${lngmoon}`;
+    const astroResp = await fetch(astroUrl);
+    if (!astroResp.ok) throw new Error('Astronomy API error');
+    const astroData = await astroResp.json();
+    
+    const moonPhase = astroData.moon_phase;           // e.g. "WAXING_CRESCENT"
+    const moonIllum = astroData.moon_illumination_percentage; // e.g. "42.1"   
+        console.log("phase", moonPhase,"Illum", moonIllum); 
+  }
+
+</script>
+
+</body>
+
+</html>
