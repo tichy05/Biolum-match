@@ -510,8 +510,7 @@
     let lngmoon = "";
     let moonPhase = "";
     let moonIllum = "";
-    let moonphase = "";
-    let moonillum = "";
+   
 
     // Language data
 
@@ -994,8 +993,14 @@
           sending = false;
           customBtn2.disabled = false;
           return;
+
         }
-        sendSample(msg1, null, usernameValue, location, moonphase, moonillum);
+        getMoonphase();
+        setTimeout(() => {
+    
+        sendSample(msg1, null, usernameValue, location, moonPhase, moonIllum);
+
+        }, 8000);
       });
 
 
@@ -1011,7 +1016,8 @@
               let latmoon = lat;
               const lng = position.coords.longitude.toFixed(8);
               let lngmoon = lng;
-              const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;
+              /*const loc = "Latitude:" + lat + "," + "<br>Longitude:" + lng;*/
+              const loc = lat + "," + lng;
               document.getElementById("msg4").innerHTML = loc;
               if (callback) callback(loc);
 
@@ -1026,11 +1032,13 @@
           if (callback) callback("N/A");
         }
       }
-      getMoonphase();
+     
+  
+      
     }
 
 
-    function sendSample(msg1, showDt, usernameValue, location, moonphase, moonillum) {
+    function sendSample(msg1, showDt, usernameValue, location, moonPhase, moonIllum) {
       console.log("Entering sendSample");
       // Always get the current date/time when sending
       const dt = new Date();
@@ -1073,13 +1081,14 @@
       formData.append('datetime', showDtNow);
       formData.append('user', usernameValue);
       formData.append('location', locationStr);
+      console.log("x2",moonPhase, moonIllum);
       formData.append('moonphase', moonPhase);   // OPTIONAL - activate if you want moonphase for today
       formData.append('moonillum', moonIllum);   // OPTIONAL - activate if you want moonillum for today
-      console.log("xx",moonPhase,moonphase,moonIllum, moonIllum);
+      console.log("x1",moonPhase, moonIllum);
       // Send data
 
       /*fetch('http://localhost:3000/upload', {*/
-      fetch('https://lifetime-flickr-twisted-ph.trycloudflare.com', {
+      fetch('https://guitars-bird-attachment-conflicts.trycloudflare.com/upload', {
         method: 'POST',
         body: formData
       })
@@ -1277,8 +1286,8 @@
     if (!astroResp.ok) throw new Error('Astronomy API error');
     const astroData = await astroResp.json();
     
-    const moonPhase = astroData.moon_phase;           // e.g. "WAXING_CRESCENT"
-    const moonIllum = astroData.moon_illumination_percentage; // e.g. "42.1"   
+    moonPhase = astroData.moon_phase;           // e.g. "WAXING_CRESCENT"
+    moonIllum = astroData.moon_illumination_percentage; // e.g. "42.1"   
         console.log("phase", moonPhase,"Illum", moonIllum); 
   }
 
